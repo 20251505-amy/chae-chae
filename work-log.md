@@ -194,3 +194,28 @@
 - **요청 요약:** 학생 시야 안에서 학생이 쫓아내기 공격을 쓰고, 맞으면 구구가 튕겨 나가게 하기
 - **수정한 파일:** js/objects/Npc.js, js/objects/Gugu.js, js/scenes/StageScene.js, spec.md
 - **판단 근거:** 사용 조건 · 맞은 뒤 · 발각 규칙을 물어 정했고(시야 안 + 60px, 2초 대기, 밀려나기만, 발각 규칙 유지), 총장님에게는 넣지 않았다.
+
+## 2026-11-18 17:25
+- **요청 요약:** 다음 작업 — '구구' 울음소리로 학생 시선 끌기 (Q, 200px 안 학생이 2초 동안 소리 난 곳을 봄, 5초 대기, "구구!" 말풍선, 총장님 제외)
+- **수정한 파일:** js/objects/Gugu.js, js/objects/Npc.js, js/scenes/StageScene.js, spec.md, task.md
+- **판단 근거:** 제안한 값을 사용자가 고른 대로 spec.md에 먼저 적었고, 쫓아내기처럼 addNpc로 놓은 학생만 반응하게 했다. 학생이 구구를 직접 보고 있으면 울음소리보다 구구를 따라 보는 쪽을 먼저 한다.
+
+## 2026-11-18 17:35
+- **요청 요약:** 경계 게이지 — 스태미나 막대 아래에, 쓰는 스테이지 화면에서만 보이게 하고 나머지는 알아서
+- **수정한 파일:** js/ui/Hud.js, js/scenes/StageScene.js, js/scenes/Stage10Scene.js, spec.md, design.md, task.md
+- **판단 근거:** 지금 빗자루 · 서류 뭉치가 있는 곳은 Stage 10뿐이라 거기서만 켰고, spec.md 3장의 "게이지가 가득 찬 상태에서 서류 뭉치에 닿으면 발각"을 따라 Stage 10 세부를 그에 맞게 고쳤다. 수치는 앞서 제안한 값(최대 100, +25/초, −10/초)을 썼다.
+
+## 2026-11-18 17:50
+- **요청 요약:** Stage 02 학생회관 만들기 (제안한 세부안 그대로), 빗자루 · 서류 뭉치 "덜 찼으면 튕겨 나가고 +40" 규칙을 Stage 10에도 적용, 순서 01 → 02 → 10
+- **수정한 파일:** js/scenes/Stage02Scene.js(새 파일), js/objects/Janitor.js(새 파일), js/scenes/StageScene.js, js/scenes/Stage10Scene.js, js/scenes/Stage01Scene.js, js/main.js, spec.md, design.md, task.md
+- **판단 근거:** 빗자루와 서류 뭉치가 같은 규칙을 쓰도록 StageScene에 공용 hitByHazard를 두었고, 미화원은 design.md의 '그 밖의 NPC' 모습을 그대로 썼다. 칠판은 오른쪽 위 UI와 겹쳐서 게시판 오른쪽으로 옮겼다.
+
+## 2026-11-18 18:00
+- **요청 요약:** 시작 화면 꾸미기, 게임 제목을 "총장님의 새우깡을 훔쳐라!"로 변경, 게임 그래픽 꾸미기는 (가) design.md 규칙 안에서 — 시작 화면부터 진행
+- **수정한 파일:** js/scenes/TitleScene.js, js/objects/Gugu.js, js/ui/style.js, index.html, spec.md, design.md
+- **판단 근거:** 5가지 색 · 그라디언트 없음 규칙을 지키려고 화려함은 움직임(튀는 제목, 나는 구구, 떨어지는 새우깡, 깜빡이는 안내)으로 냈고, 구구 그림은 Gugu.drawLook으로 꺼내 시작 화면과 게임이 같은 모습을 쓰게 했다. 제목만 72px로 키우는 것은 design.md에 따로 적었다.
+
+## 2026-11-18 18:08
+- **요청 요약:** 시작 화면 부제 삭제, 글씨체를 아주 귀엽게 변경
+- **수정한 파일:** js/scenes/TitleScene.js, js/ui/style.js, js/main.js, index.html, design.md
+- **판단 근거:** 귀여운 한글 Google Fonts 중 굵게 쓸 수 있어 작은 글씨(16px)도 잘 읽히는 Gaegu 700을 골랐고, 모든 글씨가 style.js의 글꼴 하나를 쓰므로 게임 전체에 함께 적용했다.

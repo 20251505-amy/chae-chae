@@ -21,11 +21,15 @@ const PECK_FLASH_MS = 100; // 쪼는 순간 몸이 노랗게 바뀌는 시간
 const KNOCKBACK_DISTANCE = 150; // 픽셀
 const KNOCKBACK_TIME = 200; // ms
 
+const COO_COOLDOWN = 5000; // '구구' 울음소리를 한 번 내면 이 시간(ms) 동안 다시 못 낸다
+
 export default class Gugu {
   // onPeck(x, y): Enter로 쪼았을 때 장면에 알려 주는 함수
   constructor(scene, x, y, onPeck) {
     this.scene = scene;
     this.onPeck = onPeck;
+    this.onCoo = null; // Q로 울었을 때 장면에 알려 주는 함수 (장면이 넣는다)
+    this.cooCooldown = 0;
 
     // 그림자를 먼저 만들어 구구 아래에 그려지게 한다.
     this.shadow = scene.add.ellipse(x, y, 30, 14, COLORS.navy, 0.35).setVisible(false);
@@ -44,8 +48,8 @@ export default class Gugu {
     this.exhausted = false; // 스태미나가 바닥나면 스페이스를 뗄 때까지 다시 날 수 없다.
     this.knockbackLeft = 0; // 튕겨 나가는 중이면 남은 시간 (ms)
 
-    // 이동: 방향키 또는 WASD / 비행: 스페이스를 누르는 동안 / 쪼기: Enter
-    this.keys = scene.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,ENTER');
+    // 이동: 방향키 또는 WASD / 비행: 스페이스를 누르는 동안 / 쪼기: Enter / 울음소리: Q
+    this.keys = scene.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,ENTER,Q');
   }
 
   // canAct가 false이면 (키패드를 쓰는 중 등) 제자리에 멈춰 있는다.
@@ -53,6 +57,8 @@ export default class Gugu {
     const k = this.keys;
     const peckPressed = Phaser.Input.Keyboard.JustDown(k.ENTER);
     const spaceReleased = Phaser.Input.Keyboard.JustUp(k.SPACE);
+    const cooPressed = Phaser.Input.Keyboard.JustDown(k.Q);
+    this.cooCooldown = Math.max(0, this.cooCooldown - delta);
 
     if (!canAct) {
       this.sprite.body.setVelocity(0, 0);
@@ -93,6 +99,10 @@ export default class Gugu {
     this.updateParts();
 
     if (peckPressed) this.peck();
+    if (cooPressed && this.cooCooldown === 0 && this.onCoo) {
+      this.cooCooldown = COO_COOLDOWN;
+      this.onCoo(this.sprite.x, this.sprite.y);
+    }
   }
 
   // (fromX, fromY)에서 먼 쪽으로 튕겨 나간다.
@@ -110,11 +120,15 @@ export default class Gugu {
     this.look.setPosition(x, y).setRotation(this.facing).setScale(scale);
   }
 
+  drawBody(bodyColor) {
+    this.graphic.clear();
+    Gugu.drawLook(this.graphic, bodyColor);
+  }
+
   // 위에서 본 비둘기. 오른쪽(0도)을 바라보는 모습으로 그리고, look을 돌려 방향을 바꾼다.
   // 꼬리 끝 줄무늬 · 날개의 짙은 줄 두 개 · 작은 진남색 부리는 캐릭터 그림을 따른 것이다.
-  drawBody(bodyColor) {
-    const g = this.graphic;
-    g.clear();
+  // 시작 화면에서도 같은 모습을 그리려고 따로 부를 수 있게 했다.
+  static drawLook(g, bodyColor) {
     g.lineStyle(OUTLINE, COLORS.navy);
 
     // 꼬리 (끝에 진남색 줄무늬)

@@ -25,8 +25,8 @@ export default class Stage01Scene extends StageScene {
       { x: 820, y: 240 }, { x: 980, y: 240 }, { x: 980, y: 360 }, { x: 820, y: 360 }, { x: 820, y: 240 },
     ], speed, STUDENT_LOOKS[4]);
 
-    // 오른쪽 끝의 출입문. 키패드를 풀면 열리고, 닿으면 Stage 10으로 이동한다. (MVP)
-    const door = this.addDoor(1265, 360, 20, 120, 'Stage10Scene');
+    // 오른쪽 끝의 출입문. 키패드를 풀면 열리고, 닿으면 Stage 02로 이동한다.
+    const door = this.addDoor(1265, 360, 20, 120, 'Stage02Scene');
 
     // 키패드. 맞히면 Stage 01 보상(비행 스태미나 기초 강화)을 얻고 출입문이 열린다.
     this.addKeypad(900, 300, '3829', () => {

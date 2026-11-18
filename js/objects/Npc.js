@@ -14,6 +14,8 @@ const VIEW_ALPHA = 0.25;
 const SHOO_RANGE = 60; // 픽셀
 const SHOO_COOLDOWN = 2000; // ms
 
+const DISTRACT_TIME = 2000; // '구구' 울음소리를 들으면 이 시간(ms) 동안 멈춰서 소리 난 곳을 본다
+
 export default class Npc {
   // path: [{ x, y }, ...] 지나갈 지점들. 끝에 닿으면 반대로 되돌아간다.
   // drawLook(graphics): 겉모습을 그리는 함수 (없으면 진남색 원 + 눈으로 그린다)
@@ -22,6 +24,7 @@ export default class Npc {
     this.path = path;
     this.onShoo = null; // 쫓아내기를 썼을 때 부를 함수 (장면이 넣는다. 없으면 쫓아내기를 쓰지 않는다)
     this.shooCooldown = 0;
+    this.distractLeft = 0; // 울음소리 쪽을 보고 있는 남은 시간 (ms)
     this.speed = speed;
     this.targetIndex = 1;
     this.step = 1; // 1이면 앞으로, -1이면 되돌아가는 중
@@ -50,16 +53,23 @@ export default class Npc {
   // 시야 거리 밖으로 벗어나거나 날아오르면 놓치고, 다시 순찰을 이어 간다.
   update(delta, gugu) {
     this.shooCooldown = Math.max(0, this.shooCooldown - delta);
+    this.distractLeft = Math.max(0, this.distractLeft - delta);
     this.seesGugu = gugu !== null && this.canSee(gugu.x, gugu.y);
     if (this.seesGugu) {
       this.facing = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, gugu.x, gugu.y);
       const close = Phaser.Math.Distance.Between(this.sprite.x, this.sprite.y, gugu.x, gugu.y) <= SHOO_RANGE;
       if (this.onShoo && close && this.shooCooldown === 0) this.shoo();
-    } else {
+    } else if (this.distractLeft === 0) {
       this.move(delta);
     }
     this.drawView();
     this.updateEye();
+  }
+
+  // '구구' 울음소리를 들으면 순찰을 멈추고 잠시 (x, y) 쪽을 본다.
+  distract(x, y) {
+    this.distractLeft = DISTRACT_TIME;
+    this.facing = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, x, y);
   }
 
   // 쫓아내기: 앞쪽으로 팔을 휘두르는 호를 잠깐 그리고, 장면에 알린다.

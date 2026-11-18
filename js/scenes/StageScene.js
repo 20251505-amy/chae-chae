@@ -2,6 +2,7 @@ import Gugu from '../objects/Gugu.js';
 import Clue from '../objects/Clue.js';
 import Npc from '../objects/Npc.js';
 import Door from '../objects/Door.js';
+import Janitor from '../objects/Janitor.js';
 import { notebook } from '../systems/notebook.js';
 import { inventory } from '../systems/inventory.js';
 import NotebookPanel from '../ui/NotebookPanel.js';
@@ -12,14 +13,23 @@ import { COLORS, CSS_COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
 const PECK_RANGE = 40; // 구구가 쪼을 수 있는 거리 (픽셀)
 const CAUGHT_TIME = 1500; // 시야에 이만큼(ms) 계속 보이면 발각된다
+const COO_RANGE = 200; // '구구' 울음소리가 들리는 거리 (픽셀)
+const COO_BUBBLE_MS = 800; // "구구!" 말풍선이 떠 있는 시간
+
+// 경계 게이지: 날갯짓 소음으로 찬다. 빗자루 · 서류 뭉치가 있는 스테이지에서만 쓴다.
+const ALERT_MAX = 100;
+const ALERT_RISE = 25; // 날고 있을 때 1초에 차는 양
+const ALERT_FALL = 10; // 땅에 있을 때 1초에 주는 양
+const ALERT_HIT = 40; // 게이지가 덜 찬 상태에서 빗자루 · 서류 뭉치에 맞으면 오르는 양
 
 // 모든 스테이지가 함께 쓰는 탑다운 장면의 바탕.
 // 새 스테이지는 이 클래스를 상속하고 key와 스테이지 정보만 넘기면 된다.
 export default class StageScene extends Phaser.Scene {
   constructor(key, stage) {
     super(key);
-    // { number: '01', name: '정문 & 향학로', start?: { x, y }, startInVent?: true }
+    // { number: '01', name: '정문 & 향학로', start?: { x, y }, startInVent?: true, alertGauge?: true }
     // start가 없으면 화면 가운데에서 시작한다. startInVent이면 환풍구 안에서 날고 있는 상태로 시작한다.
+    // alertGauge이면 경계 게이지를 쓰고 화면에 보여 준다.
     this.stage = stage;
   }
 
@@ -29,6 +39,7 @@ export default class StageScene extends Phaser.Scene {
     // 쪼을 수 있는 물건(스위치 · 키패드 등) 목록. 각 스테이지가 { x, y, onPeck() } 형태로 넣는다.
     this.peckables = [];
     this.npcs = [];
+    this.students = []; // addNpc로 놓은 학생 (울음소리 · 쫓아내기는 학생만 해당)
     this.exposure = 0; // 구구가 시야에 계속 보인 시간 (ms)
     this.stageItems = []; // 이 스테이지에서 얻은 아이템 (클리어 화면에 보여 준다)
 
@@ -37,10 +48,13 @@ export default class StageScene extends Phaser.Scene {
     this.gugu = new Gugu(this, this.checkpoint.x, this.checkpoint.y,
       (x, y) => this.handlePeck(x, y));
     if (this.stage.startInVent) this.gugu.enterVent();
+    this.gugu.onCoo = (x, y) => this.coo(x, y);
 
     this.notebookPanel = new NotebookPanel(this);
     this.keypadPanel = new KeypadPanel(this);
-    this.hud = new Hud(this, this.gugu, () => this.notebookPanel.toggle());
+    this.alert = 0;
+    this.hud = new Hud(this, this.gugu, () => this.notebookPanel.toggle(),
+      this.stage.alertGauge ? () => this.alert / ALERT_MAX : null);
     this.popup = new Popup(this); // 실패 · 클리어 화면
     // 열려 있는 동안 구구가 멈추는 창 목록 (스테이지가 더 넣을 수 있다)
     this.panels = [this.keypadPanel, this.popup];
@@ -55,6 +69,7 @@ export default class StageScene extends Phaser.Scene {
 
     const canAct = this.panels.every((p) => !p.isOpen && !p.justClosed);
     this.gugu.update(delta, canAct);
+    if (this.stage.alertGauge) this.updateAlert(delta / 1000);
     this.hud.update();
     this.panels.forEach((p) => {
       p.justClosed = false;
@@ -86,10 +101,31 @@ export default class StageScene extends Phaser.Scene {
       text: message,
       buttonLabel: '다시 하기',
       onConfirm: () => {
+        this.alert = 0;
         this.gugu.respawn(this.checkpoint.x, this.checkpoint.y);
         if (this.stage.startInVent) this.gugu.enterVent();
       },
     });
+  }
+
+  // 날고 있으면(환풍구 안 제외) 경계 게이지가 차고, 땅에 있으면 준다.
+  updateAlert(seconds) {
+    const flapping = this.gugu.isFlying && !this.gugu.inVent;
+    const change = flapping ? ALERT_RISE : -ALERT_FALL;
+    this.alert = Phaser.Math.Clamp(this.alert + change * seconds, 0, ALERT_MAX);
+  }
+
+  get alertFull() {
+    return this.alert >= ALERT_MAX;
+  }
+
+  // 빗자루 · 서류 뭉치에 닿았을 때. 경계 게이지가 가득 찼으면 true(발각)를 돌려준다.
+  // 덜 찼으면 (fromX, fromY) 반대쪽으로 튕겨 나가고 게이지가 오른다.
+  hitByHazard(fromX, fromY) {
+    if (this.alertFull) return true;
+    this.gugu.knockback(fromX, fromY);
+    this.alert = Math.min(ALERT_MAX, this.alert + ALERT_HIT);
+    return false;
   }
 
   // 스테이지 클리어 화면: 얻은 아이템을 보여 주고, "다음 스테이지"를 누르면 nextSceneKey로 이동한다.
@@ -116,6 +152,34 @@ export default class StageScene extends Phaser.Scene {
       this.showMessage('휙! 쫓겨났다');
     };
     this.npcs.push(npc);
+    this.students.push(npc);
+  }
+
+  // 청소 미화원을 놓는다. 빗자루에 맞으면 경계 게이지에 따라 튕겨 나가거나 발각된다.
+  addJanitor(path, speed) {
+    const janitor = new Janitor(this, path, speed, this.gugu.sprite);
+    janitor.onBroomHit = () => {
+      if (this.hitByHazard(janitor.sprite.x, janitor.sprite.y)) {
+        this.caught('빗자루에 쓸려 캠퍼스 밖으로 방생되었다...');
+      } else {
+        this.showMessage('휙! 빗자루에 쓸렸다');
+      }
+    };
+    this.npcs.push(janitor);
+  }
+
+  // '구구' 울음소리: 구구 위에 말풍선을 띄우고, 가까운 학생이 잠시 소리 난 곳을 보게 한다.
+  coo(x, y) {
+    const bubble = this.add.text(x, y - 36, '구구!', {
+      ...TEXT.small,
+      backgroundColor: CSS_COLORS.cream,
+      padding: { x: 6, y: 2 },
+    }).setOrigin(0.5).setDepth(50);
+    this.time.delayedCall(COO_BUBBLE_MS, () => bubble.destroy());
+
+    this.students
+      .filter((s) => Phaser.Math.Distance.Between(x, y, s.sprite.x, s.sprite.y) <= COO_RANGE)
+      .forEach((s) => s.distract(x, y));
   }
 
   // 출입문을 놓는다. 열린 뒤 구구가 닿으면 클리어 화면을 거쳐 nextSceneKey 스테이지로 이동한다.

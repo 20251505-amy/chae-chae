@@ -10,14 +10,16 @@ export const COLORS = {
 export const CSS_COLORS = {
   cream: '#F4EBD9',
   navy: '#2B2D42',
+  yellow: '#FFB547',
   red: '#E5533D',
 };
 
 export const OUTLINE = 3; // 외곽선 두께
 
-const FONT = 'Jua, sans-serif';
+const FONT = 'Gaegu, sans-serif';
+const FONT_STYLE = 'bold'; // 얇으면 잘 안 보여서 굵게 쓴다
 export const TEXT = {
-  large: { fontFamily: FONT, fontSize: '40px', color: CSS_COLORS.navy },
-  normal: { fontFamily: FONT, fontSize: '22px', color: CSS_COLORS.navy },
-  small: { fontFamily: FONT, fontSize: '16px', color: CSS_COLORS.navy },
+  large: { fontFamily: FONT, fontStyle: FONT_STYLE, fontSize: '40px', color: CSS_COLORS.navy },
+  normal: { fontFamily: FONT, fontStyle: FONT_STYLE, fontSize: '22px', color: CSS_COLORS.navy },
+  small: { fontFamily: FONT, fontStyle: FONT_STYLE, fontSize: '16px', color: CSS_COLORS.navy },
 };

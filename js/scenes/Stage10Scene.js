@@ -20,6 +20,7 @@ export default class Stage10Scene extends StageScene {
       name: '대학본부 최상층 총장실',
       start: VENT, // 체크포인트도 환풍구
       startInVent: true,
+      alertGauge: true, // 서류 뭉치가 있어 경계 게이지를 쓴다
     });
   }
 
@@ -28,10 +29,10 @@ export default class Stage10Scene extends StageScene {
     super.create();
     this.npcs.push(new President(this, PRESIDENT.x, PRESIDENT.y));
 
-    // 총장님이 던지는 서류 뭉치. 구구가 맞으면 환풍구로 돌아간다.
+    // 총장님이 던지는 서류 뭉치. 경계 게이지가 가득 찬 상태에서 맞으면 환풍구로 돌아간다.
     this.attacking = false;
     this.papers = this.physics.add.group();
-    this.physics.add.overlap(this.gugu.sprite, this.papers, () => this.hitByPaper());
+    this.physics.add.overlap(this.gugu.sprite, this.papers, (_, paper) => this.hitByPaper(paper));
 
     // 책상 위 새우깡 봉지를 Enter로 쪼면 타이밍 미니게임이 열린다.
     this.timingPanel = new TimingPanel(this);
@@ -105,9 +106,16 @@ export default class Stage10Scene extends StageScene {
     paper.body.setVelocity(Math.cos(angle) * PAPER_SPEED, Math.sin(angle) * PAPER_SPEED);
   }
 
-  // 서류 뭉치에 맞으면 환풍구로 돌아가고, 새우깡도 다시 꺼내야 한다.
-  hitByPaper() {
+  // 경계 게이지가 가득 찬 상태에서 서류 뭉치에 맞으면 환풍구로 돌아가고, 새우깡도 다시 꺼내야 한다.
+  // 게이지가 덜 찼으면 튕겨 나가고 게이지가 오른다.
+  hitByPaper(paper) {
     if (!this.attacking) return; // 같은 순간에 여러 장에 맞아도 한 번만 처리한다.
+    const { x, y } = paper;
+    paper.destroy();
+    if (!this.hitByHazard(x, y)) {
+      this.showMessage('퍽! 서류 뭉치에 맞았다');
+      return;
+    }
     this.stopAttack();
     this.gotSnack = false;
     super.caught('서류 뭉치에 맞았다! 새우깡을 놓치고 방생되었다...');
