@@ -11,4 +11,9 @@ export const inventory = {
   has(id) {
     return this.items.some((i) => i.id === id);
   },
+
+  // 처음부터 다시 할 때 비운다.
+  reset() {
+    this.items = [];
+  },
 };

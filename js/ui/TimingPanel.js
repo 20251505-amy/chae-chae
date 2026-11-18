@@ -1,7 +1,9 @@
-// 정밀 타이밍 미니게임. 막대 위를 왕복하는 표시가 초록 칸에 들어왔을 때 Enter를 누르면 성공, 빗나가면 실패.
-// 게임은 멈추지 않는다. 디자인은 [미정]이라 지금은 단순한 도형으로 그린다.
+// 정밀 타이밍 미니게임. 막대 위를 왕복하는 표시가 노란 칸에 들어왔을 때 Enter를 누르면 성공, 빗나가면 실패.
+// 게임은 멈추지 않는다. design.md에 따라 크림색 창, 회색 막대, 노란 칸, 진남색 표시로 그린다.
+import { COLORS, OUTLINE, TEXT } from './style.js';
+
 const BAR_WIDTH = 400;
-const ZONE_WIDTH = 40; // 초록 칸 너비 (좁을수록 어렵다)
+const ZONE_WIDTH = 40; // 노란 칸 너비 (좁을수록 어렵다)
 const SPEED = 500; // 표시가 1초에 움직이는 픽셀
 
 export default class TimingPanel {
@@ -10,14 +12,14 @@ export default class TimingPanel {
 
     const { width, height } = scene.scale;
     this.container = scene.add.container(width / 2, height - 110).setDepth(110).setVisible(false);
-    this.container.add(scene.add.rectangle(0, 0, 460, 110, 0x000000, 0.85));
-    this.container.add(scene.add.text(0, -32, '초록 칸에서 Enter로 새우깡 1개 꺼내기', {
-      fontSize: '18px',
-      color: '#ffffff',
-    }).setOrigin(0.5));
-    this.container.add(scene.add.rectangle(0, 15, BAR_WIDTH, 24, 0x555555));
-    this.zone = scene.add.rectangle(0, 15, ZONE_WIDTH, 24, 0x4caf50);
-    this.marker = scene.add.rectangle(0, 15, 6, 40, 0xffffff);
+    this.container.add(scene.add.rectangle(0, 0, 460, 110, COLORS.cream)
+      .setStrokeStyle(OUTLINE, COLORS.navy));
+    this.container.add(scene.add.text(0, -30, '노란 칸에서 Enter로 새우깡 1개 꺼내기', TEXT.normal)
+      .setOrigin(0.5));
+    this.container.add(scene.add.rectangle(0, 15, BAR_WIDTH, 24, COLORS.gray)
+      .setStrokeStyle(OUTLINE, COLORS.navy));
+    this.zone = scene.add.rectangle(0, 15, ZONE_WIDTH, 24, COLORS.yellow);
+    this.marker = scene.add.rectangle(0, 15, 6, 40, COLORS.navy);
     this.container.add([this.zone, this.marker]);
 
     scene.input.keyboard.on('keydown', (event) => {

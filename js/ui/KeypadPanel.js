@@ -1,6 +1,8 @@
 // 4자리 비밀번호 키패드. 키패드를 Enter로 쪼면 열린다.
 // 방향키 / WASD로 숫자를 고르고 Enter로 쪼아 누른다. 게임은 멈추지 않는다.
-// 디자인은 [미정]이라 지금은 단순한 상자와 칸으로 그린다.
+// design.md에 따라 크림색 창, 회색 칸, 진남색 외곽선 · 글자, 노란 선택 테두리로 그린다.
+import { COLORS, CSS_COLORS, OUTLINE, TEXT } from './style.js';
+
 const CODE_LENGTH = 4;
 const LABELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '닫기', '0', ''];
 const COLS = 3;
@@ -14,31 +16,30 @@ export default class KeypadPanel {
 
     const { width, height } = scene.scale;
     this.container = scene.add.container(width / 2, height / 2).setDepth(110).setVisible(false);
-    this.container.add(scene.add.rectangle(0, 0, 270, 400, 0x000000, 0.85));
+    // 팝업 뒤를 진남색 35%로 어둡게 한다.
+    this.container.add(scene.add.rectangle(0, 0, width, height, COLORS.navy, 0.35));
+    this.container.add(scene.add.rectangle(0, 0, 270, 400, COLORS.cream)
+      .setStrokeStyle(OUTLINE, COLORS.navy));
 
-    this.display = scene.add.text(0, -155, '', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
+    this.display = scene.add.text(0, -155, '', TEXT.large).setOrigin(0.5);
     this.container.add(this.display);
 
     this.cells = LABELS.map((label, i) => {
       const x = (i % COLS - 1) * STEP;
       const y = -85 + Math.floor(i / COLS) * STEP;
       if (label) {
-        this.container.add(scene.add.rectangle(x, y, CELL, CELL, 0x444444));
-        this.container.add(scene.add.text(x, y, label, {
-          fontSize: label.length > 1 ? '18px' : '28px',
-          color: '#ffffff',
-        }).setOrigin(0.5));
+        this.container.add(scene.add.rectangle(x, y, CELL, CELL, COLORS.gray)
+          .setStrokeStyle(OUTLINE, COLORS.navy));
+        this.container.add(scene.add.text(x, y, label, TEXT.normal).setOrigin(0.5));
       }
       return { x, y, label };
     });
 
-    this.cursor = scene.add.rectangle(0, 0, CELL, CELL).setStrokeStyle(3, 0xffe08a);
+    this.cursor = scene.add.rectangle(0, 0, CELL, CELL).setStrokeStyle(6, COLORS.yellow);
     this.container.add(this.cursor);
 
-    this.container.add(scene.add.text(0, 220, '방향키로 고르고 Enter로 쪼기', {
-      fontSize: '16px',
-      color: '#cccccc',
-    }).setOrigin(0.5));
+    this.container.add(scene.add.text(0, 225, '방향키로 고르고 Enter로 쪼기', TEXT.small)
+      .setColor(CSS_COLORS.cream).setOrigin(0.5));
 
     scene.input.keyboard.on('keydown', (event) => {
       if (this.isOpen) this.handleKey(event.code);

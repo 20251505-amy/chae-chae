@@ -11,4 +11,9 @@ export const notebook = {
   has(id) {
     return this.clues.some((c) => c.id === id);
   },
+
+  // 처음부터 다시 할 때 비운다.
+  reset() {
+    this.clues = [];
+  },
 };

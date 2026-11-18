@@ -139,3 +139,43 @@
 - **요청 요약:** 화면 작업 전에 design.md 만들기
 - **수정한 파일:** design.md, spec.md, task.md
 - **판단 근거:** 수업 양식(색 5가지, 글자 3단계, 버튼, 배치, 그래픽 스타일, 하지 않을 것)에 맞춰 30줄 안팎으로 쓰고, 스타일은 기획의 코믹한 분위기에 맞춰 밝은 카툰으로 정했다.
+
+## 2026-11-18 16:53
+- **요청 요약:** 기존 그래픽을 design.md에 맞추기
+- **수정한 파일:** index.html, css/style.css, js/main.js, js/ui/style.js(새 파일), js/objects/Gugu.js, Npc.js, President.js, Clue.js, Door.js, js/scenes/TitleScene.js, StageScene.js, Stage10Scene.js, js/ui/NotebookPanel.js, KeypadPanel.js, TimingPanel.js
+- **판단 근거:** 색 · 글꼴 · 크기를 style.js 한 곳에 모아 모든 파일이 같은 값을 쓰게 했고, 동작은 바꾸지 않고 겉모습만 바꿨다(design.md의 "앞쪽 표시"에 따라 구구 부리 · NPC 눈 추가).
+
+## 2026-11-18 16:55
+- **요청 요약:** 화면 작업 시작 — 플레이 화면 UI (스태미나 막대, 수첩 버튼)
+- **수정한 파일:** js/ui/button.js(새 파일), js/ui/Hud.js(새 파일), js/scenes/StageScene.js, js/ui/NotebookPanel.js, task.md
+- **판단 근거:** design.md 배치대로 오른쪽 위에 두었고, 버튼은 실패 · 엔딩 화면에서도 쓰도록 공용 함수로 만들었다. 수첩 창은 UI와 겹치지 않게 조금 아래로 내렸다.
+
+## 2026-11-18 16:56
+- **요청 요약:** 실패 화면 — 발각되면 가운데 팝업(발각! · 이유 · 다시 하기)을 띄우고 버튼을 누르면 체크포인트로 복귀
+- **수정한 파일:** js/ui/FailPopup.js(새 파일), js/scenes/StageScene.js, js/scenes/Stage10Scene.js, spec.md, task.md
+- **판단 근거:** 팝업이 떠 있는 동안 다시 발각되지 않도록 게임 움직임을 멈췄고, 마우스가 없어도 되게 Enter로도 다시 하기를 누를 수 있게 했다.
+
+## 2026-11-18 16:58
+- **요청 요약:** 스테이지 클리어 화면 — 출입문에 닿으면 클리어 팝업(얻은 아이템, 다음 스테이지 버튼)
+- **수정한 파일:** js/ui/Popup.js(새 파일), js/ui/FailPopup.js(삭제), js/scenes/StageScene.js, js/scenes/Stage10Scene.js, spec.md, task.md
+- **판단 근거:** 실패 화면과 모양이 같아 FailPopup을 제목 · 설명 · 버튼만 바꿔 쓰는 공용 Popup으로 바꾸고 두 화면이 함께 쓰게 했다.
+
+## 2026-11-18 17:02
+- **요청 요약:** 엔딩 화면 — 탈출하면 엔딩 화면(탈출 성공!, 처음으로 버튼), 처음으로 누르면 수첩 · 아이템 비우고 시작 화면
+- **수정한 파일:** js/scenes/EndingScene.js(새 파일), js/scenes/Stage10Scene.js, js/main.js, js/systems/notebook.js, js/systems/inventory.js, spec.md, task.md
+- **판단 근거:** 제안한 구성대로 만들었고, 처음부터 다시 할 때 이전 판의 단서 · 아이템이 남지 않도록 비우는 기능을 더했다.
+
+## 2026-11-18 17:03
+- **요청 요약:** 첨부한 회색 비둘기 그림을 구구의 캐릭터 디자인으로 쓰기 (코드로 비슷하게 그리기 선택)
+- **수정한 파일:** js/objects/Gugu.js, design.md
+- **판단 근거:** 그림은 정면 모습이고 게임은 탑다운이라, 그림의 특징(회색 몸, 날개 줄, 꼬리 줄무늬, 작은 부리)을 위에서 본 모습으로 옮겨 그렸고 충돌 크기는 그대로 두었다.
+
+## 2026-11-18 17:06
+- **요청 요약:** 총장님 디자인을 더 사실적으로 바꾸기
+- **수정한 파일:** js/objects/President.js, design.md
+- **판단 근거:** design.md의 "실사 · 실제 인물을 닮게 그리지 않기"를 지키려고, 사진처럼이 아니라 위에서 본 정장 차림 어른을 도형으로 자세히 그리는 방향으로 했다.
+
+## 2026-11-18 17:07
+- **요청 요약:** Stage 01 난이도 올리기 — 학생들이 단서 근처에서 움직이게
+- **수정한 파일:** js/scenes/Stage01Scene.js, spec.md
+- **판단 근거:** 학생 수(5명)는 명세대로 두고, 4명은 학보 조각 하나씩 옆을, 1명은 키패드 둘레를 돌게 했다. 속도도 80에서 100으로 조금 올렸고, 시작 위치에서는 바로 들키지 않게 거리를 두었다.

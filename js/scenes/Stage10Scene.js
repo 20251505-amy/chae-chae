@@ -1,9 +1,10 @@
 import StageScene from './StageScene.js';
 import President from '../objects/President.js';
 import TimingPanel from '../ui/TimingPanel.js';
+import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
-// 그래픽 스타일이 [미정]이라 지금은 도형과 이름표로 그린다.
-const LABEL_STYLE = { fontSize: '14px', color: '#aaaaaa' };
+// design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
+const LABEL_STYLE = TEXT.small;
 const VENT = { x: 640, y: 90 };
 const SNACK_BAG = { x: 640, y: 400 }; // 책상 위 새우깡 봉지
 const BAG_HIT_RANGE = 25; // 날고 있는 구구가 이만큼 가까워지면 봉지에 부딪힌다 (픽셀)
@@ -47,6 +48,7 @@ export default class Stage10Scene extends StageScene {
   update(time, delta) {
     if (this.escaped) return;
     super.update(time, delta);
+    if (this.popup.isOpen) return;
 
     // 새우깡을 꺼낸 뒤 발코니 창문에 닿으면 탈출 → 최종 성공
     if (this.gotSnack && this.touchesWindow()) {
@@ -96,7 +98,8 @@ export default class Stage10Scene extends StageScene {
 
   // 총장님 자리에서 구구가 있는 쪽으로 서류 뭉치를 던진다.
   throwPaper() {
-    const paper = this.add.rectangle(PRESIDENT.x, PRESIDENT.y, 16, 12, 0xffffff);
+    const paper = this.add.rectangle(PRESIDENT.x, PRESIDENT.y, 16, 12, COLORS.cream)
+      .setStrokeStyle(OUTLINE, COLORS.red);
     this.papers.add(paper);
     const angle = Phaser.Math.Angle.Between(PRESIDENT.x, PRESIDENT.y, this.gugu.sprite.x, this.gugu.sprite.y);
     paper.body.setVelocity(Math.cos(angle) * PAPER_SPEED, Math.sin(angle) * PAPER_SPEED);
@@ -117,16 +120,11 @@ export default class Stage10Scene extends StageScene {
       new Phaser.Geom.Circle(this.gugu.sprite.x, this.gugu.sprite.y, this.gugu.sprite.radius), area);
   }
 
-  // 최종 성공. 게임을 멈추고 성공 문구를 띄운다. (엔딩 화면은 '7. 화면' 작업에서 만든다)
+  // 최종 성공 → 엔딩 화면으로 간다.
   escape() {
     this.escaped = true;
     this.stopAttack();
-    this.gugu.sprite.body.setVelocity(0, 0);
-    this.add.text(this.scale.width / 2, this.scale.height / 2, '탈출 성공!\n새우깡 1개 미션 완료', {
-      fontSize: '40px',
-      color: '#ffe08a',
-      align: 'center',
-    }).setOrigin(0.5).setDepth(120);
+    this.scene.start('EndingScene');
   }
 
   // 이미 1개를 꺼냈는데 또 쪼면 2개째를 집은 것이라 즉시 발각된다.
@@ -146,18 +144,19 @@ export default class Stage10Scene extends StageScene {
 
   // 방 배치: 위쪽 가운데 천장 환풍구, 가운데 책상, 오른쪽 창가에 총장님, 오른쪽 끝 발코니 창문
   drawRoom() {
-    this.add.rectangle(VENT.x, VENT.y, 80, 50, 0x333333).setStrokeStyle(2, 0x777777);
+    this.add.rectangle(VENT.x, VENT.y, 80, 50, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy);
     this.add.text(VENT.x, VENT.y - 40, '천장 환풍구', LABEL_STYLE).setOrigin(0.5);
 
-    this.add.rectangle(640, 400, 220, 120, 0x6d4c41);
+    this.add.rectangle(640, 400, 220, 120, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy);
     this.add.text(640, 475, '책상', LABEL_STYLE).setOrigin(0.5);
-    this.add.rectangle(SNACK_BAG.x, SNACK_BAG.y, 30, 22, 0xff9800);
+    this.add.rectangle(SNACK_BAG.x, SNACK_BAG.y, 30, 22, COLORS.yellow)
+      .setStrokeStyle(OUTLINE, COLORS.navy);
     this.add.text(SNACK_BAG.x, SNACK_BAG.y - 25, '새우깡 봉지', LABEL_STYLE).setOrigin(0.5);
 
     this.add.text(1120, 435, '총장님', LABEL_STYLE).setOrigin(0.5);
 
     const w = BALCONY_WINDOW;
-    this.add.rectangle(w.x, w.y, w.width, w.height, 0x81d4fa);
+    this.add.rectangle(w.x, w.y, w.width, w.height, COLORS.cream).setStrokeStyle(OUTLINE, COLORS.navy);
     this.add.text(1235, 525, '발코니 창문', LABEL_STYLE).setOrigin(0.5);
   }
 }

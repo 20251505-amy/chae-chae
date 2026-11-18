@@ -1,26 +1,25 @@
 import { notebook } from '../systems/notebook.js';
+import { COLORS, OUTLINE, TEXT } from './style.js';
 
 // 발자국 수첩 화면. N 키로 열고 닫으며, 열려 있어도 게임은 멈추지 않는다.
-// 디자인은 [미정]이라 지금은 반투명 상자에 단서 이름만 보여 준다.
+// design.md에 따라 크림색 바탕, 진남색 외곽선과 글자로 그린다.
 const WIDTH = 320;
 const PADDING = 16;
 
 export default class NotebookPanel {
   constructor(scene) {
     const x = scene.scale.width - WIDTH - 20;
-    const y = 20;
-    const height = scene.scale.height - 40;
+    const y = 76; // 오른쪽 위 UI(스태미나 · 수첩 버튼) 아래부터
+    const height = scene.scale.height - y - 20;
 
     this.container = scene.add.container(x, y).setDepth(100).setVisible(false);
-    this.container.add(scene.add.rectangle(0, 0, WIDTH, height, 0x000000, 0.7).setOrigin(0));
-    this.container.add(scene.add.text(PADDING, PADDING, '발자국 수첩', {
-      fontSize: '22px',
-      color: '#ffffff',
-    }));
+    this.container.add(scene.add.rectangle(0, 0, WIDTH, height, COLORS.cream)
+      .setStrokeStyle(OUTLINE, COLORS.navy).setOrigin(0));
+    this.container.add(scene.add.text(PADDING, PADDING, '발자국 수첩', TEXT.normal));
     this.list = scene.add.text(PADDING, PADDING + 40, '', {
-      fontSize: '18px',
-      color: '#dddddd',
+      ...TEXT.small,
       wordWrap: { width: WIDTH - PADDING * 2 },
+      lineSpacing: 6,
     });
     this.container.add(this.list);
 

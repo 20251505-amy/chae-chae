@@ -1,12 +1,13 @@
-// 정해진 길을 왔다 갔다 하는 NPC. 그래픽 스타일이 [미정]이라 지금은 파란 원으로 그린다.
+// 정해진 길을 왔다 갔다 하는 NPC. design.md에 따라 진남색 원 몸에 앞쪽을 보는 크림색 눈을 그린다.
 // 앞쪽으로 부채꼴 시야를 보여 주고, 시야 안의 구구를 감지한다.
-const COLOR = 0x5b8def;
+import { COLORS } from '../ui/style.js';
+
 const DEFAULT_SPEED = 80; // 1초에 움직이는 픽셀
 
 const VIEW_DISTANCE = 150; // 시야 거리 (픽셀)
 const VIEW_ANGLE = 60; // 시야 각도 (도)
-const VIEW_COLOR = 0xffff99; // 평소 시야 색
-const VIEW_ALERT_COLOR = 0xff4444; // 구구를 보고 있을 때 시야 색
+const VIEW_COLOR = COLORS.yellow; // 평소 시야 색
+const VIEW_ALERT_COLOR = COLORS.red; // 구구를 보고 있을 때 시야 색
 const VIEW_ALPHA = 0.25;
 
 export default class Npc {
@@ -23,7 +24,8 @@ export default class Npc {
 
     // 시야를 먼저 만들어 NPC 아래에 그려지게 한다.
     this.view = scene.add.graphics();
-    this.sprite = scene.add.circle(path[0].x, path[0].y, 14, COLOR);
+    this.sprite = scene.add.circle(path[0].x, path[0].y, 14, COLORS.navy);
+    this.eye = scene.add.circle(path[0].x, path[0].y, 4, COLORS.cream);
   }
 
   // gugu: 감지할 위치 { x, y }. 날고 있어서 들키지 않을 때는 null.
@@ -31,6 +33,16 @@ export default class Npc {
     this.move(delta);
     this.seesGugu = gugu !== null && this.canSee(gugu.x, gugu.y);
     this.drawView();
+    this.updateEye();
+  }
+
+  // 눈을 바라보는 쪽으로 옮긴다.
+  updateEye() {
+    const reach = this.sprite.radius * 0.6;
+    this.eye.setPosition(
+      this.sprite.x + Math.cos(this.facing) * reach,
+      this.sprite.y + Math.sin(this.facing) * reach,
+    );
   }
 
   move(delta) {
