@@ -107,8 +107,15 @@ export default class StageScene extends Phaser.Scene {
   }
 
   // 정해진 길(path)을 왔다 갔다 하는 NPC를 놓는다.
-  addNpc(path, speed) {
-    this.npcs.push(new Npc(this, path, speed));
+  // drawLook: 겉모습을 그리는 함수 (예: studentLooks.js의 STUDENT_LOOKS[0])
+  // 이렇게 놓은 NPC(학생)는 가까이 온 구구를 쫓아내기로 튕겨 낸다.
+  addNpc(path, speed, drawLook) {
+    const npc = new Npc(this, path, speed, drawLook);
+    npc.onShoo = () => {
+      this.gugu.knockback(npc.sprite.x, npc.sprite.y);
+      this.showMessage('휙! 쫓겨났다');
+    };
+    this.npcs.push(npc);
   }
 
   // 출입문을 놓는다. 열린 뒤 구구가 닿으면 클리어 화면을 거쳐 nextSceneKey 스테이지로 이동한다.

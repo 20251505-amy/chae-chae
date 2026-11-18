@@ -17,6 +17,10 @@ const STAMINA_REGEN = 20; // 땅에 있을 때 1초에 차는 양
 
 const PECK_FLASH_MS = 100; // 쪼는 순간 몸이 노랗게 바뀌는 시간
 
+// 학생의 쫓아내기에 맞으면 이 시간 동안 이 거리만큼 튕겨 나간다.
+const KNOCKBACK_DISTANCE = 150; // 픽셀
+const KNOCKBACK_TIME = 200; // ms
+
 export default class Gugu {
   // onPeck(x, y): Enter로 쪼았을 때 장면에 알려 주는 함수
   constructor(scene, x, y, onPeck) {
@@ -38,6 +42,7 @@ export default class Gugu {
     this.isFlying = false;
     this.stamina = this.maxStamina;
     this.exhausted = false; // 스태미나가 바닥나면 스페이스를 뗄 때까지 다시 날 수 없다.
+    this.knockbackLeft = 0; // 튕겨 나가는 중이면 남은 시간 (ms)
 
     // 이동: 방향키 또는 WASD / 비행: 스페이스를 누르는 동안 / 쪼기: Enter
     this.keys = scene.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,ENTER');
@@ -66,6 +71,15 @@ export default class Gugu {
       return;
     }
 
+    // 튕겨 나가는 중: 정해진 방향으로 밀려난다.
+    if (this.knockbackLeft > 0) {
+      this.knockbackLeft -= delta;
+      const { x, y } = this.knockbackVelocity;
+      this.sprite.body.setVelocity(x, y);
+      this.updateParts();
+      return;
+    }
+
     const dx = (k.RIGHT.isDown || k.D.isDown) - (k.LEFT.isDown || k.A.isDown);
     const dy = (k.DOWN.isDown || k.S.isDown) - (k.UP.isDown || k.W.isDown);
     if (dx || dy) this.facing = Math.atan2(dy, dx);
@@ -79,6 +93,14 @@ export default class Gugu {
     this.updateParts();
 
     if (peckPressed) this.peck();
+  }
+
+  // (fromX, fromY)에서 먼 쪽으로 튕겨 나간다.
+  knockback(fromX, fromY) {
+    const angle = Phaser.Math.Angle.Between(fromX, fromY, this.sprite.x, this.sprite.y);
+    const speed = KNOCKBACK_DISTANCE / (KNOCKBACK_TIME / 1000);
+    this.knockbackVelocity = { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed };
+    this.knockbackLeft = KNOCKBACK_TIME;
   }
 
   // 그림자와 겉모습을 충돌 원에 맞춰 옮긴다.
@@ -135,6 +157,7 @@ export default class Gugu {
   // 체크포인트로 되돌아간다. 땅에 내려앉고 스태미나는 다시 가득 찬다.
   respawn(x, y) {
     this.sprite.body.reset(x, y);
+    this.knockbackLeft = 0;
     this.setFlying(false);
     this.stamina = this.maxStamina;
     this.exhausted = false;
