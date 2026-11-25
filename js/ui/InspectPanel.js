@@ -1,14 +1,16 @@
 import { COLORS, OUTLINE, TEXT } from './style.js';
+import { drawPaper, PAPER_WIDTH, PAPER_HEIGHT } from './paperStyles.js';
 
 // 자세히 보기 창 (design.md: 가운데). 단서를 찾거나 물건을 쪼아 살펴볼 때 연다.
-// 위에는 사람이 쓴 글이 그대로, 아래에는 구구의 한마디가 나온다.
+// 가운데에는 단서 종류(신문 · 일기 · 쪽지 등)에 맞게 꾸민 종이가, 아래에는 구구의 한마디가 나온다.
 // Enter를 누르면 닫히고 onClose를 부른다. 열려 있는 동안에는 게임이 멈춘다 (StageScene).
-const BOX_WIDTH = 700;
-const BOX_HEIGHT = 520;
 const PADDING = 28;
+const BOX_WIDTH = PAPER_WIDTH + PADDING * 2;
+const BOX_HEIGHT = 560;
 
 export default class InspectPanel {
   constructor(scene) {
+    this.scene = scene;
     this.isOpen = false;
 
     const { width, height } = scene.scale;
@@ -20,31 +22,28 @@ export default class InspectPanel {
 
     const left = -BOX_WIDTH / 2 + PADDING;
     const top = -BOX_HEIGHT / 2 + PADDING;
-    const wrap = { width: BOX_WIDTH - PADDING * 2 };
     this.title = scene.add.text(left, top, '', TEXT.normal);
-    // 사람이 쓴 글은 노란 종이 위에 적힌 것처럼 보인다.
-    this.paper = scene.add.rectangle(0, top + 44, BOX_WIDTH - PADDING * 2, 290, COLORS.yellow)
-      .setStrokeStyle(OUTLINE, COLORS.navy).setOrigin(0.5, 0);
-    this.body = scene.add.text(left + 14, top + 58, '', {
+    // 단서마다 새로 그리는 종이를 담는다.
+    this.paper = scene.add.container(0, top + 44 + PAPER_HEIGHT / 2);
+    this.comment = scene.add.text(left, top + 58 + PAPER_HEIGHT, '', {
       ...TEXT.normal,
-      wordWrap: { width: wrap.width - 28 },
-      lineSpacing: 4,
+      wordWrap: { width: PAPER_WIDTH },
     });
-    this.comment = scene.add.text(left, top + 350, '', { ...TEXT.normal, wordWrap: wrap });
     const hint = scene.add.text(BOX_WIDTH / 2 - PADDING, BOX_HEIGHT / 2 - 14, 'Enter로 닫기', TEXT.small)
       .setOrigin(1, 1);
-    this.container.add([this.title, this.paper, this.body, this.comment, hint]);
+    this.container.add([this.title, this.paper, this.comment, hint]);
 
     scene.input.keyboard.on('keydown-ENTER', () => {
       if (this.isOpen) this.confirm();
     });
   }
 
-  // clue: { title, body, comment }
+  // clue: { title, style, comment, ...종이에 그릴 값 (paperStyles.js) }
   open(clue, onClose = null) {
     this.onClose = onClose;
     this.title.setText(clue.title);
-    this.body.setText(clue.body);
+    this.paper.removeAll(true);
+    this.paper.add(drawPaper(this.scene, clue));
     this.comment.setText(`구구: "${clue.comment}"`);
     this.isOpen = true;
     this.container.setVisible(true);

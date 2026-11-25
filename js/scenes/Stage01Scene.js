@@ -5,9 +5,9 @@ import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
 const LABEL_STYLE = TEXT.small;
-const BENCH = { x: 1000, y: 180, width: 90, height: 30 }; // 밑에 둘째 학보 조각
-const TRASH_CAN = { x: 500, y: 300, width: 36, height: 36 }; // 안에 셋째 학보 조각
-const SIGN = { x: 950, y: 520, width: 120, height: 40 }; // 정문 안내판, 구석 낙서에 넷째 숫자
+const BENCH = { x: 1000, y: 180, width: 90, height: 30 }; // 밑에 일기장 (문제)
+const TRASH_CAN = { x: 500, y: 300, width: 36, height: 36 }; // 안에 힌트 쪽지
+const SIGN = { x: 950, y: 520, width: 120, height: 40 }; // 정문 안내판 (이야기)
 
 export default class Stage01Scene extends StageScene {
   constructor() {
@@ -18,11 +18,11 @@ export default class Stage01Scene extends StageScene {
     this.drawProps();
     super.create();
 
-    // 학보 조각 4개를 서로 다른 방법으로 얻는다. 순서대로 이으면 키패드 비밀번호(3829)가 된다.
-    this.addClue(400, 500, STAGE01_CLUES.paper1); // 바닥에 보이는 조각 (닿으면 줍기)
-    this.addInspectable(BENCH, STAGE01_CLUES.paper2); // 벤치 밑 (쪼면 찾기)
-    this.addInspectable(TRASH_CAN, STAGE01_CLUES.paper3); // 쓰레기통 안 (쪼면 찾기)
-    this.addInspectable(SIGN, STAGE01_CLUES.sign); // 정문 안내판 (쪼면 자세히 보기)
+    // 일기장 줄마다 첫 글자를 세로로 읽으면 키패드 비밀번호(삼팔이구 → 3829)가 된다 (story.js).
+    this.addClue(400, 500, STAGE01_CLUES.news); // 바닥의 신문 조각: 일기장이 벤치 밑에 있다 (닿으면 줍기)
+    this.addInspectable(BENCH, STAGE01_CLUES.diary); // 벤치 밑 일기장: 문제 (쪼면 찾기)
+    this.addInspectable(TRASH_CAN, STAGE01_CLUES.trash); // 쓰레기통 쪽지: 힌트 (쪼면 찾기)
+    this.addInspectable(SIGN, STAGE01_CLUES.sign); // 정문 안내판: 이야기 (쪼면 자세히 보기)
 
     // 등교하는 학생 5명 (겉모습은 모두 다르다). 각자 단서나 키패드 바로 옆을 지나가며 왔다 갔다 한다.
     const speed = 100;
