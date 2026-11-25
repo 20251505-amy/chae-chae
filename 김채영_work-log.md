@@ -234,3 +234,18 @@
 - **요청 요약:** 단서 종이를 종류별로 꾸미기 (신문은 비둘기 사진 + 속보, 일기는 일기장처럼), 계산 문제 대신 눈여겨보면 숫자가 보이는 방탈출식 문제와 따로 구하는 힌트로 바꾸기 (쓰레기통 힌트 · 일기 내용 · 소파 쪽지는 사용자가 준 문장 그대로)
 - **수정한 파일:** js/ui/paperStyles.js(새 파일), js/ui/InspectPanel.js, js/data/story.js, js/scenes/Stage01Scene.js, spec.md, design.md
 - **판단 근거:** Stage 01은 일기 첫 글자 세로 읽기(삼팔이구 → 3829)와 "머리를 위아래로" 힌트, Stage 02는 숫자 없는 시계 두 개와 "해가 진 뒤" 힌트(18 · 21 → 1821)로 문제와 힌트를 나눴다. 일기 한 줄이 줄바꿈되면 첫 글자가 흐트러지므로 창을 860px로 넓혀 한 줄에 한 문장이 들어가게 했다.
+
+## 2026-11-25 16:56
+- **요청 요약:** 벤치 · 쓰레기통을 비롯한 모든 물건을 단순 도형이 아닌 실제 모양으로 그리기, 뒤죽박죽인 글씨체를 모두 같게 하기
+- **수정한 파일:** js/objects/props.js(새 파일), js/objects/Door.js, js/objects/Clue.js, js/scenes/StageScene.js, js/scenes/Stage01Scene.js, js/scenes/Stage02Scene.js, js/scenes/Stage10Scene.js, js/main.js, design.md
+- **판단 근거:** 코드의 글꼴은 이미 Gaegu 하나였고 쓰는 기호도 모두 Gaegu에 있었다. 원인은 Google Fonts가 한글을 89조각으로 나눠 보내는데 첫 조각만 기다리고 시작해, 늦게 온 글자가 기본 글꼴로 굳어진 것이라 모든 조각을 받은 뒤 시작하게 했다. 물건은 충돌 판정은 그대로 두고 그림만 props.js로 모았다.
+
+## 2026-11-25 17:05
+- **요청 요약:** 글씨체를 더 읽기 쉬운 것으로 바꾸기, 바닥에 길을 만들고 실제 서울교대를 본뜬 디자인용 건물 세우기
+- **수정한 파일:** index.html, js/ui/style.js, js/main.js, js/objects/campus.js(새 파일), js/scenes/Stage01Scene.js, spec.md, design.md
+- **판단 근거:** 귀여운 느낌은 살리면서 손글씨보다 또렷한 Jua(주아체)를 골랐다. 건물은 서울교대 공식 캠퍼스맵 · 나무위키에서 확인한 정문(사향문) 주변 배치(왼쪽 미술2관 · 다솜채, 오른쪽 체육관)를 따랐다. 바깥 스테이지는 Stage 01뿐이라 Stage 01에만 넣었고, 학생 순찰 길 · 단서 · 키패드 자리는 피해서 놓았다.
+
+## 2026-11-25 17:15
+- **요청 요약:** 실내 스테이지(Stage 02 학생회관 동아리방, Stage 10 총장실)에도 바닥 만들기
+- **수정한 파일:** js/objects/floors.js(새 파일), js/scenes/Stage02Scene.js, js/scenes/Stage10Scene.js, design.md
+- **판단 근거:** 잔디색처럼 5가지 밖의 색을 쓰지 않으려고 마루는 크림 바탕에 회색 반투명 판자 줄로 그렸고, 러그 · 매트는 가구 아래와 출입문 · 창가에만 깔아 학생 시야와 빗자루 범위가 잘 보이게 했다.

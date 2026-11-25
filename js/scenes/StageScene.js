@@ -3,6 +3,7 @@ import Clue from '../objects/Clue.js';
 import Npc from '../objects/Npc.js';
 import Door from '../objects/Door.js';
 import Janitor from '../objects/Janitor.js';
+import { drawKeypad } from '../objects/props.js';
 import { notebook } from '../systems/notebook.js';
 import { inventory } from '../systems/inventory.js';
 import NotebookPanel from '../ui/NotebookPanel.js';
@@ -12,7 +13,7 @@ import DialogBox from '../ui/DialogBox.js';
 import { STAGE_INTRO } from '../data/story.js';
 import Hud from '../ui/Hud.js';
 import Popup from '../ui/Popup.js';
-import { COLORS, CSS_COLORS, OUTLINE, TEXT } from '../ui/style.js';
+import { CSS_COLORS, TEXT } from '../ui/style.js';
 
 const PECK_RANGE = 40; // 구구가 쪼을 수 있는 거리 (픽셀)
 const CAUGHT_TIME = 1500; // 시야에 이만큼(ms) 계속 보이면 발각된다
@@ -209,7 +210,7 @@ export default class StageScene extends Phaser.Scene {
   // 비밀번호 키패드를 놓는다. Enter로 쪼면 입력 화면이 열린다.
   // code: 정답 4자리 문자열, onSuccess: 맞혔을 때 실행할 함수
   addKeypad(x, y, code, onSuccess) {
-    this.add.rectangle(x, y, 28, 28, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy).setDepth(-1);
+    drawKeypad(this, x, y);
     this.peckables.push({ x, y, onPeck: () => this.keypadPanel.open(code, onSuccess) });
   }
 

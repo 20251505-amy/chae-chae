@@ -1,11 +1,13 @@
 import StageScene from './StageScene.js';
 import { STUDENT_LOOKS } from '../objects/studentLooks.js';
 import { STAGE01_CLUES } from '../data/story.js';
-import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
+import { drawBench, drawSign, drawTrashCan } from '../objects/props.js';
+import { drawBuilding, drawGate, drawPlaza, drawWalkway } from '../objects/campus.js';
+import { TEXT } from '../ui/style.js';
 
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
 const LABEL_STYLE = TEXT.small;
-const BENCH = { x: 1000, y: 180, width: 90, height: 30 }; // 밑에 일기장 (문제)
+const BENCH = { x: 1000, y: 180, width: 100, height: 36 }; // 밑에 일기장 (문제)
 const TRASH_CAN = { x: 500, y: 300, width: 36, height: 36 }; // 안에 힌트 쪽지
 const SIGN = { x: 950, y: 520, width: 120, height: 40 }; // 정문 안내판 (이야기)
 
@@ -15,6 +17,7 @@ export default class Stage01Scene extends StageScene {
   }
 
   create() {
+    this.drawCampus();
     this.drawProps();
     super.create();
 
@@ -44,18 +47,36 @@ export default class Stage01Scene extends StageScene {
     });
   }
 
+  // 바닥 길과 디자인용 건물 (충돌 없음). 왼쪽 정문(사향문)에서 오른쪽 학생회관 출입문까지 향학로가 이어진다.
+  // 실제 서울교대처럼 정문을 들어서면 왼쪽(위)에 미술2관, 오른쪽(아래)에 사향융합체육관이 있다.
+  drawCampus() {
+    const ROAD = { x: 640, y: 360, width: 1280, height: 70 };
+    drawWalkway(this, ROAD);
+    drawWalkway(this, { x: BENCH.x, y: 262, width: 44, height: 126 }); // 향학로 → 벤치
+    drawWalkway(this, { x: SIGN.x, y: 447, width: 44, height: 104 }); // 향학로 → 정문 안내판
+    drawPlaza(this, 640, ROAD.y, 90);
+    this.add.text(760, ROAD.y + ROAD.height / 2 + 12, '향학로', LABEL_STYLE).setOrigin(0.5).setDepth(-5);
+
+    drawGate(this, 30, ROAD.y, ROAD.height, '사향문 (정문)');
+    drawBuilding(this, { x: 135, y: 175, width: 210, height: 150, name: '미술2관', sub: '다솜채 cafe' });
+    drawBuilding(this, { x: 140, y: 590, width: 220, height: 180, name: '사향융합체육관' });
+    // 학생회관: 향학로 끝 출입문 위아래의 두 동
+    drawBuilding(this, { x: 1215, y: 245, width: 130, height: 130, name: '학생회관', sub: '편의점 · 구내식당' });
+    drawBuilding(this, { x: 1215, y: 475, width: 130, height: 130, name: '학생회관', sub: '동아리방' });
+  }
+
   // 벤치 · 쓰레기통 · 정문 안내판
   drawProps() {
     const b = BENCH;
-    this.add.rectangle(b.x, b.y, b.width, b.height, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy).setDepth(-2);
-    this.add.text(b.x, b.y + 30, '벤치', LABEL_STYLE).setOrigin(0.5);
+    drawBench(this, b.x, b.y, b.width, b.height);
+    this.add.text(b.x, b.y + 32, '벤치', LABEL_STYLE).setOrigin(0.5);
 
     const t = TRASH_CAN;
-    this.add.circle(t.x, t.y, t.width / 2, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy).setDepth(-2);
+    drawTrashCan(this, t.x, t.y, t.width);
     this.add.text(t.x, t.y + 32, '쓰레기통', LABEL_STYLE).setOrigin(0.5);
 
     const s = SIGN;
-    this.add.rectangle(s.x, s.y, s.width, s.height, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy).setDepth(-2);
-    this.add.text(s.x, s.y + 34, '정문 안내판', LABEL_STYLE).setOrigin(0.5);
+    drawSign(this, s.x, s.y, s.width, s.height);
+    this.add.text(s.x, s.y + 42, '정문 안내판', LABEL_STYLE).setOrigin(0.5);
   }
 }

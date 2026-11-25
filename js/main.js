@@ -4,7 +4,7 @@ import Stage01Scene from './scenes/Stage01Scene.js';
 import Stage02Scene from './scenes/Stage02Scene.js';
 import Stage10Scene from './scenes/Stage10Scene.js';
 import EndingScene from './scenes/EndingScene.js';
-import { CSS_COLORS } from './ui/style.js';
+import { CSS_COLORS, FONT_FAMILY } from './ui/style.js';
 
 const scenes = [TitleScene, StoryScene, Stage01Scene, Stage02Scene, Stage10Scene, EndingScene];
 
@@ -35,5 +35,14 @@ const config = {
   scene: scenes,
 };
 
-// 글꼴(Gaegu 굵게)을 먼저 불러온 뒤 게임을 시작한다. 불러오지 못해도 기본 글꼴로 시작한다.
-document.fonts.load('bold 22px Gaegu').finally(() => new Phaser.Game(config));
+// 글꼴(style.js의 FONT_FAMILY)을 먼저 불러온 뒤 게임을 시작한다. 불러오지 못해도 기본 글꼴로 시작한다.
+// Google Fonts는 한글 글꼴을 글자 범위별로 여러 조각(약 90개)으로 나눠 보내고, 쓰는 글자의 조각만 그때그때 받는다.
+// 캔버스 글씨는 한 번 그리면 다시 그리지 않으므로, 조각이 늦게 오면 그 글자만 기본 글꼴로 남아 글씨체가 뒤섞인다.
+// 그래서 모든 조각을 미리 받은 뒤에 시작한다.
+const fontFaces = [...document.fonts].filter((face) => face.family.replace(/["']/g, '') === FONT_FAMILY);
+const fontLoads = fontFaces.length
+  ? fontFaces.map((face) => face.load())
+  : [document.fonts.load(`22px ${FONT_FAMILY}`, '가나다')]; // 글꼴 목록을 아직 못 읽었을 때
+Promise.all(fontLoads)
+  .catch(() => {})
+  .finally(() => new Phaser.Game(config));

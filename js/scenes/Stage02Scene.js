@@ -1,9 +1,11 @@
 import StageScene from './StageScene.js';
 import { STUDENT_LOOKS } from '../objects/studentLooks.js';
 import { STAGE02_CLUES } from '../data/story.js';
-import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
+import { drawBulletinBoard, drawChalkboard, drawDesk, drawSofa } from '../objects/props.js';
+import { drawDoorMat, drawRug, drawWoodFloor } from '../objects/floors.js';
+import { TEXT } from '../ui/style.js';
 
-// design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
+// 가구 그림은 props.js, 이름표는 design.md의 작은 글씨로 그린다.
 const LABEL_STYLE = TEXT.small;
 // 게시판 · 칠판은 오른쪽 위 UI(스태미나 · 경계 게이지)와 겹치지 않게 조금 아래에 둔다.
 const BOARD = { x: 380, y: 110, width: 320, height: 40 }; // 동아리 게시판
@@ -58,14 +60,19 @@ export default class Stage02Scene extends StageScene {
 
   // 방 배치: 위쪽 벽 게시판, 그 오른쪽 칠판, 가운데 책상, 아래쪽 소파, 오른쪽 아래 키패드
   drawRoom() {
+    // 바닥: 나무 마루, 책상 아래 러그, 출입문 앞 매트 (floors.js)
+    drawWoodFloor(this);
+    drawRug(this, { x: DESK.x, y: DESK.y, width: 300, height: 170 });
+    drawDoorMat(this, { x: 1225, y: 360, width: 60, height: 110 });
+
     const furniture = [
-      [BOARD, '동아리 게시판', -1],
-      [CHALKBOARD, '칠판', -1],
-      [DESK, '책상', 1],
-      [SOFA, '소파', 1],
+      [BOARD, '동아리 게시판', -1, drawBulletinBoard],
+      [CHALKBOARD, '칠판', -1, drawChalkboard],
+      [DESK, '책상', 1, drawDesk],
+      [SOFA, '소파', 1, drawSofa],
     ];
-    furniture.forEach(([f, label, side]) => {
-      this.add.rectangle(f.x, f.y, f.width, f.height, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy);
+    furniture.forEach(([f, label, side, draw]) => {
+      draw(this, f.x, f.y, f.width, f.height);
       this.add.text(f.x, f.y + side * (f.height / 2 + 14), label, LABEL_STYLE).setOrigin(0.5);
     });
     this.add.text(KEYPAD.x, KEYPAD.y + 30, '연극부 방 키패드', LABEL_STYLE).setOrigin(0.5);

@@ -16,8 +16,10 @@ export const CSS_COLORS = {
 
 export const OUTLINE = 3; // 외곽선 두께
 
-const FONT = 'Gaegu, sans-serif';
-const FONT_STYLE = 'bold'; // 얇으면 잘 안 보여서 굵게 쓴다
+// Jua(주아체): 둥글고 귀여우면서 작은 글씨도 또렷하게 읽힌다. 굵기가 하나뿐이라 따로 굵게 하지 않는다.
+export const FONT_FAMILY = 'Jua';
+const FONT = `${FONT_FAMILY}, sans-serif`;
+const FONT_STYLE = 'normal';
 export const TEXT = {
   large: { fontFamily: FONT, fontStyle: FONT_STYLE, fontSize: '40px', color: CSS_COLORS.navy },
   normal: { fontFamily: FONT, fontStyle: FONT_STYLE, fontSize: '22px', color: CSS_COLORS.navy },

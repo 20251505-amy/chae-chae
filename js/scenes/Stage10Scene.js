@@ -2,6 +2,8 @@ import StageScene from './StageScene.js';
 import President from '../objects/President.js';
 import TimingPanel from '../ui/TimingPanel.js';
 import { STAGE10_CLUES } from '../data/story.js';
+import { drawDesk, drawPhotoFrame, drawSnackBag, drawVent, drawWindow } from '../objects/props.js';
+import { drawRug, drawWoodFloor } from '../objects/floors.js';
 import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
@@ -107,6 +109,8 @@ export default class Stage10Scene extends StageScene {
     this.papers.add(paper);
     const angle = Phaser.Math.Angle.Between(PRESIDENT.x, PRESIDENT.y, this.gugu.sprite.x, this.gugu.sprite.y);
     paper.body.setVelocity(Math.cos(angle) * PAPER_SPEED, Math.sin(angle) * PAPER_SPEED);
+    // 날아가는 동안 빙글빙글 돈다 (충돌 판정은 그대로).
+    this.tweens.add({ targets: paper, angle: 360, duration: 500, repeat: -1 });
   }
 
   // 경계 게이지가 가득 찬 상태에서 서류 뭉치에 맞으면 환풍구로 돌아가고, 새우깡도 다시 꺼내야 한다.
@@ -155,22 +159,25 @@ export default class Stage10Scene extends StageScene {
 
   // 방 배치: 위쪽 가운데 천장 환풍구, 가운데 책상, 오른쪽 창가에 총장님, 오른쪽 끝 발코니 창문
   drawRoom() {
-    this.add.rectangle(VENT.x, VENT.y, 80, 50, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy);
+    // 바닥: 나무 마루, 책상 아래 큰 러그, 창가(총장님 자리) 러그 (floors.js)
+    drawWoodFloor(this);
+    drawRug(this, { x: SNACK_BAG.x, y: SNACK_BAG.y, width: 340, height: 200 });
+    drawRug(this, { x: PRESIDENT.x, y: PRESIDENT.y, width: 160, height: 240 });
+
+    drawVent(this, VENT.x, VENT.y, 80, 50);
     this.add.text(VENT.x, VENT.y - 40, '천장 환풍구', LABEL_STYLE).setOrigin(0.5);
 
-    this.add.rectangle(640, 400, 220, 120, COLORS.gray).setStrokeStyle(OUTLINE, COLORS.navy);
+    drawDesk(this, 640, 400, 220, 120);
     this.add.text(640, 475, '책상', LABEL_STYLE).setOrigin(0.5);
-    this.add.rectangle(SNACK_BAG.x, SNACK_BAG.y, 30, 22, COLORS.yellow)
-      .setStrokeStyle(OUTLINE, COLORS.navy);
-    this.add.text(SNACK_BAG.x, SNACK_BAG.y - 25, '새우깡 봉지', LABEL_STYLE).setOrigin(0.5);
-    this.add.rectangle(PHOTO.x, PHOTO.y, PHOTO.width, PHOTO.height, COLORS.cream)
-      .setStrokeStyle(OUTLINE, COLORS.navy);
+    drawSnackBag(this, SNACK_BAG.x, SNACK_BAG.y, 34, 28);
+    this.add.text(SNACK_BAG.x, SNACK_BAG.y - 28, '새우깡 봉지', LABEL_STYLE).setOrigin(0.5);
+    drawPhotoFrame(this, PHOTO.x, PHOTO.y, PHOTO.width, PHOTO.height);
     this.add.text(PHOTO.x, PHOTO.y - 22, '액자', LABEL_STYLE).setOrigin(0.5);
 
     this.add.text(1120, 435, '총장님', LABEL_STYLE).setOrigin(0.5);
 
     const w = BALCONY_WINDOW;
-    this.add.rectangle(w.x, w.y, w.width, w.height, COLORS.cream).setStrokeStyle(OUTLINE, COLORS.navy);
+    drawWindow(this, w.x, w.y, w.width, w.height);
     this.add.text(1235, 525, '발코니 창문', LABEL_STYLE).setOrigin(0.5);
   }
 }
