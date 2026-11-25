@@ -157,6 +157,6 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   startGame() {
-    this.scene.start('Stage01Scene');
+    this.scene.start('StoryScene');
   }
 }

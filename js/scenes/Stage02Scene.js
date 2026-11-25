@@ -1,5 +1,6 @@
 import StageScene from './StageScene.js';
 import { STUDENT_LOOKS } from '../objects/studentLooks.js';
+import { STAGE02_CLUES } from '../data/story.js';
 import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
@@ -25,14 +26,11 @@ export default class Stage02Scene extends StageScene {
     this.drawRoom();
     super.create();
 
-    // 게시판 시간표 조각 3개와 칠판 낙서 1개. 둘을 대조하면 키패드 비밀번호(1821)가 된다.
-    this.addClue(290, 170, { id: 'stage02-timetable-1', name: '게시판 시간표 조각: 밴드부 14시~16시' });
-    this.addClue(490, 170, { id: 'stage02-timetable-2', name: '게시판 시간표 조각: 연극부 18시~21시' });
-    this.addClue(560, 560, { id: 'stage02-timetable-3', name: '게시판 시간표 조각: 바둑부 10시~12시' });
-    this.addClue(800, 170, {
-      id: 'stage02-chalk',
-      name: '칠판 낙서: 연극부 방 비번 = 연습 시작 시각 + 끝나는 시각',
-    });
+    // 게시판(시간표) · 칠판(낙서가 소파를 가리킴) · 소파 밑 쪽지(비번 규칙)를 이으면 키패드 비밀번호(1821)가 된다.
+    // 모두 가까이 가서 쪼아야 살펴볼 수 있다.
+    this.addInspectable(BOARD, STAGE02_CLUES.board);
+    this.addInspectable(CHALKBOARD, STAGE02_CLUES.chalk);
+    this.addInspectable(SOFA, STAGE02_CLUES.sofa);
 
     // 청소 미화원: 책상 둘레 복도를 돌며 3초마다 빗자루를 휘두른다.
     this.addJanitor([

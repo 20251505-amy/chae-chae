@@ -1,12 +1,14 @@
 import StageScene from './StageScene.js';
 import President from '../objects/President.js';
 import TimingPanel from '../ui/TimingPanel.js';
+import { STAGE10_CLUES } from '../data/story.js';
 import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
 const LABEL_STYLE = TEXT.small;
 const VENT = { x: 640, y: 90 };
 const SNACK_BAG = { x: 640, y: 400 }; // 책상 위 새우깡 봉지
+const PHOTO = { x: 550, y: 380, width: 26, height: 20 }; // 책상 위 액자 (이야기 단서)
 const BAG_HIT_RANGE = 25; // 날고 있는 구구가 이만큼 가까워지면 봉지에 부딪힌다 (픽셀)
 const BALCONY_WINDOW = { x: 1265, y: 400, width: 20, height: 220 };
 const PRESIDENT = { x: 1120, y: 400 };
@@ -43,13 +45,14 @@ export default class Stage10Scene extends StageScene {
       onPeck: () => this.peckSnackBag(),
     });
 
-    this.showMessage('스페이스를 눌렀다 떼면 환풍구에서 내려간다');
+    // 책상 위 액자: 쪼면 자세히 볼 수 있다 (비밀번호와는 상관없는 이야기 단서).
+    this.addInspectable(PHOTO, STAGE10_CLUES.photo);
   }
 
   update(time, delta) {
     if (this.escaped) return;
     super.update(time, delta);
-    if (this.popup.isOpen) return;
+    if (this.paused) return;
 
     // 새우깡을 꺼낸 뒤 발코니 창문에 닿으면 탈출 → 최종 성공
     if (this.gotSnack && this.touchesWindow()) {
@@ -160,6 +163,9 @@ export default class Stage10Scene extends StageScene {
     this.add.rectangle(SNACK_BAG.x, SNACK_BAG.y, 30, 22, COLORS.yellow)
       .setStrokeStyle(OUTLINE, COLORS.navy);
     this.add.text(SNACK_BAG.x, SNACK_BAG.y - 25, '새우깡 봉지', LABEL_STYLE).setOrigin(0.5);
+    this.add.rectangle(PHOTO.x, PHOTO.y, PHOTO.width, PHOTO.height, COLORS.cream)
+      .setStrokeStyle(OUTLINE, COLORS.navy);
+    this.add.text(PHOTO.x, PHOTO.y - 22, '액자', LABEL_STYLE).setOrigin(0.5);
 
     this.add.text(1120, 435, '총장님', LABEL_STYLE).setOrigin(0.5);
 

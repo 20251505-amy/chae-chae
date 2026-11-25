@@ -7,6 +7,9 @@ import { notebook } from '../systems/notebook.js';
 import { inventory } from '../systems/inventory.js';
 import NotebookPanel from '../ui/NotebookPanel.js';
 import KeypadPanel from '../ui/KeypadPanel.js';
+import InspectPanel from '../ui/InspectPanel.js';
+import DialogBox from '../ui/DialogBox.js';
+import { STAGE_INTRO } from '../data/story.js';
 import Hud from '../ui/Hud.js';
 import Popup from '../ui/Popup.js';
 import { COLORS, CSS_COLORS, OUTLINE, TEXT } from '../ui/style.js';
@@ -56,13 +59,25 @@ export default class StageScene extends Phaser.Scene {
     this.hud = new Hud(this, this.gugu, () => this.notebookPanel.toggle(),
       this.stage.alertGauge ? () => this.alert / ALERT_MAX : null);
     this.popup = new Popup(this); // 실패 · 클리어 화면
+    this.inspectPanel = new InspectPanel(this); // 단서 · 물건 자세히 보기
+    this.dialog = new DialogBox(this); // 구구의 대사
     // 열려 있는 동안 구구가 멈추는 창 목록 (스테이지가 더 넣을 수 있다)
-    this.panels = [this.keypadPanel, this.popup];
+    this.panels = [this.keypadPanel, this.popup, this.inspectPanel, this.dialog];
+    // 열려 있는 동안 게임 전체가 멈추는 창 목록
+    this.pausePanels = [this.popup, this.inspectPanel, this.dialog];
+
+    // 스테이지를 시작할 때 구구가 이야기를 한다.
+    const intro = STAGE_INTRO[this.stage.number];
+    if (intro) this.dialog.open(intro);
+  }
+
+  get paused() {
+    return this.pausePanels.some((p) => p.isOpen);
   }
 
   update(time, delta) {
-    // 실패 · 클리어 화면이 떠 있는 동안에는 모든 움직임을 멈춘다.
-    if (this.popup.isOpen) {
+    // 실패 · 클리어 화면, 자세히 보기 창, 대사창이 떠 있는 동안에는 모든 움직임을 멈춘다.
+    if (this.paused) {
       this.gugu.update(delta, false);
       return;
     }
@@ -199,22 +214,40 @@ export default class StageScene extends Phaser.Scene {
   }
 
   // 구구 가까이에 있는 물건 하나를 쫀다.
+  // 물건에 area({ x, y, width, height })가 있으면 그 사각형 둘레 PECK_RANGE 안에서 쫄 수 있다.
   handlePeck(x, y) {
-    const target = this.peckables.find(
-      (p) => Phaser.Math.Distance.Between(x, y, p.x, p.y) <= PECK_RANGE,
-    );
+    const target = this.peckables.find((p) => {
+      if (!p.area) return Phaser.Math.Distance.Between(x, y, p.x, p.y) <= PECK_RANGE;
+      const { area: a } = p;
+      return Math.abs(x - a.x) <= a.width / 2 + PECK_RANGE && Math.abs(y - a.y) <= a.height / 2 + PECK_RANGE;
+    });
     if (target) target.onPeck();
   }
 
-  // 단서를 놓는다. 구구가 닿으면 수첩에 자동으로 저장되고 사라진다.
+  // 바닥에 보이는 단서를 놓는다. 구구가 닿으면 사라지고 자세히 보기 창이 열린다.
   addClue(x, y, clue) {
     if (notebook.has(clue.id)) return;
     const item = new Clue(this, x, y, clue);
     this.physics.add.overlap(this.gugu.sprite, item.sprite, () => {
-      notebook.add(clue);
       item.destroy();
-      this.notebookPanel.refresh();
-      this.showMessage(`수첩에 저장: ${clue.name}`);
+      this.inspect(clue);
+    });
+  }
+
+  // 가까이 가서 쪼면 살펴볼 수 있는 물건(게시판 · 칠판 등)이나, 밑 · 안에 단서가 숨겨진 물건(벤치 · 소파 등).
+  // area: 물건의 사각형 { x, y, width, height }. 몇 번이든 다시 쪼아 볼 수 있다.
+  addInspectable(area, clue) {
+    this.peckables.push({ area, onPeck: () => this.inspect(clue) });
+  }
+
+  // 자세히 보기 창을 열고, 처음 본 단서는 수첩에 자동으로 저장한다.
+  // (창을 닫기 전에 발각되어도 남도록 열 때 저장한다)
+  inspect(clue) {
+    const isNew = !notebook.has(clue.id);
+    notebook.add(clue);
+    this.notebookPanel.refresh();
+    this.inspectPanel.open(clue, () => {
+      if (isNew) this.showMessage(`수첩에 저장: ${clue.name}`);
     });
   }
 

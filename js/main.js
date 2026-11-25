@@ -1,11 +1,12 @@
 import TitleScene from './scenes/TitleScene.js';
+import StoryScene from './scenes/StoryScene.js';
 import Stage01Scene from './scenes/Stage01Scene.js';
 import Stage02Scene from './scenes/Stage02Scene.js';
 import Stage10Scene from './scenes/Stage10Scene.js';
 import EndingScene from './scenes/EndingScene.js';
 import { CSS_COLORS } from './ui/style.js';
 
-const scenes = [TitleScene, Stage01Scene, Stage02Scene, Stage10Scene, EndingScene];
+const scenes = [TitleScene, StoryScene, Stage01Scene, Stage02Scene, Stage10Scene, EndingScene];
 
 // 개발 확인용: index.html?stage=1 처럼 열면 해당 스테이지부터 시작한다.
 const stageByParam = { 1: Stage01Scene, 2: Stage02Scene, 10: Stage10Scene };

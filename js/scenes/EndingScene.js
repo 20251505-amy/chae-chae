@@ -2,14 +2,21 @@ import { TEXT } from '../ui/style.js';
 import { createButton } from '../ui/button.js';
 import { notebook } from '../systems/notebook.js';
 import { inventory } from '../systems/inventory.js';
+import DialogBox from '../ui/DialogBox.js';
+import { ENDING } from '../data/story.js';
 
-// 엔딩 화면: 탈출 성공 문구와 "처음으로" 버튼. 버튼이나 Enter를 누르면 수첩 · 아이템을 비우고 시작 화면으로 간다.
+// 엔딩 화면: 먼저 엔딩 대사가 나오고, 끝나면 탈출 성공 문구와 "처음으로" 버튼.
+// 버튼이나 Enter를 누르면 수첩 · 아이템을 비우고 시작 화면으로 간다.
 export default class EndingScene extends Phaser.Scene {
   constructor() {
     super('EndingScene');
   }
 
   create() {
+    new DialogBox(this).open(ENDING, () => this.showResult());
+  }
+
+  showResult() {
     const { width, height } = this.scale;
 
     this.add.text(width / 2, height / 2 - 70, '탈출 성공!', TEXT.large).setOrigin(0.5);

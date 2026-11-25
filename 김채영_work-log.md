@@ -219,3 +219,8 @@
 - **요청 요약:** 시작 화면 부제 삭제, 글씨체를 아주 귀엽게 변경
 - **수정한 파일:** js/scenes/TitleScene.js, js/ui/style.js, js/main.js, index.html, design.md
 - **판단 근거:** 귀여운 한글 Google Fonts 중 굵게 쓸 수 있어 작은 글씨(16px)도 잘 읽히는 Gaegu 700을 골랐고, 모든 글씨가 style.js의 글꼴 하나를 쓰므로 게임 전체에 함께 적용했다.
+
+## 2026-11-25 15:49
+- **요청 요약:** 숨겨진 쪽지와 장소를 찾아가 쪼아 보는 장치(게시판 자세히 보기 등)로 단서를 다양하게 얻게 하고, 이야기(시작 · 스테이지 · 단서 · 엔딩 대사, 구구 가족사, 구구는 모르고 플레이어만 아는 총장님의 사연)를 넣기
+- **수정한 파일:** js/data/story.js(새 파일), js/ui/DialogBox.js(새 파일), js/ui/InspectPanel.js(새 파일), js/scenes/StoryScene.js(새 파일), js/scenes/StageScene.js, js/scenes/Stage01Scene.js, js/scenes/Stage02Scene.js, js/scenes/Stage10Scene.js, js/scenes/TitleScene.js, js/scenes/EndingScene.js, js/main.js, spec.md, design.md, task.md
+- **판단 근거:** "구구는 사람 글씨를 모르고 숫자 · 그림만 알아본다"는 장치로, 단서 창에는 사람이 쓴 글을 그대로 보여 주고 구구의 한마디는 빗나가게 했다. 비밀번호(3829, 1821)는 그대로 두고 얻는 방법만 바꿨으며, 긴 글을 읽는 동안 들키지 않도록 대사창 · 자세히 보기 창이 열려 있으면 게임을 멈추게 했다.
