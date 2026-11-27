@@ -54,6 +54,14 @@ export default class StageScene extends Phaser.Scene {
     if (this.stage.startInVent) this.gugu.enterVent();
     this.gugu.onCoo = (x, y) => this.coo(x, y);
 
+    // 높이 있는 물건(건물 · 가구). 걸어서는 지나가지 못하고, 날아서 넘거나 위에 내려앉을 수 있다.
+    // 위에 내려앉으면 그 위를 걸을 수 있고, 가장자리를 걸어 나가면 바닥으로 내려온다.
+    this.obstacles = this.physics.add.staticGroup();
+    this.standingOn = null; // 구구가 올라서 있는 물건
+    this.wasFlying = this.gugu.isFlying;
+    this.physics.add.collider(this.gugu.sprite, this.obstacles, null,
+      (_, obstacle) => !this.gugu.isFlying && obstacle !== this.standingOn);
+
     this.notebookPanel = new NotebookPanel(this);
     this.keypadPanel = new KeypadPanel(this);
     this.alert = 0;
@@ -85,6 +93,7 @@ export default class StageScene extends Phaser.Scene {
 
     const canAct = this.panels.every((p) => !p.isOpen && !p.justClosed);
     this.gugu.update(delta, canAct);
+    this.updateFooting();
     if (this.stage.alertGauge) this.updateAlert(delta / 1000);
     this.hud.update();
     this.panels.forEach((p) => {
@@ -94,6 +103,8 @@ export default class StageScene extends Phaser.Scene {
 
     // 날고 있는 구구는 들키지 않는다.
     const target = this.gugu.isFlying ? null : this.gugu.sprite;
+    // 키패드를 푸는 동안 학생은 걷지 않고 제자리에 서 있는다. (시야 감지는 그대로, 미화원은 해당 없음)
+    this.students.forEach((s) => { s.frozen = this.keypadPanel.isOpen; });
     this.npcs.forEach((npc) => npc.update(delta, target));
     this.guguSeen = this.npcs.some((npc) => npc.seesGugu);
 
@@ -122,6 +133,25 @@ export default class StageScene extends Phaser.Scene {
         if (this.stage.startInVent) this.gugu.enterVent();
       },
     });
+  }
+
+  // 높이 있는 물건을 놓는다. rect: { x, y, width, height } (가운데 기준, 그림은 장면이 따로 그린다)
+  addObstacle(rect) {
+    this.obstacles.add(this.add.rectangle(rect.x, rect.y, rect.width, rect.height).setVisible(false));
+  }
+
+  // 내려앉는 순간 구구가 물건 위에 있으면 그 물건에 올라선다. 걸어서 물건 밖으로 나가면 내려온다.
+  updateFooting() {
+    const { x, y } = this.gugu.sprite;
+    const isOver = (o) => Math.abs(x - o.x) <= o.width / 2 && Math.abs(y - o.y) <= o.height / 2;
+    if (this.gugu.isFlying) {
+      this.standingOn = null;
+    } else if (this.wasFlying) {
+      this.standingOn = this.obstacles.getChildren().find(isOver) ?? null;
+    } else if (this.standingOn && !isOver(this.standingOn)) {
+      this.standingOn = null;
+    }
+    this.wasFlying = this.gugu.isFlying;
   }
 
   // 날고 있으면(환풍구 안 제외) 경계 게이지가 차고, 땅에 있으면 준다.

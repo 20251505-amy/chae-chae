@@ -9,6 +9,7 @@ import { COLORS, OUTLINE, TEXT } from '../ui/style.js';
 // design.md에 따라 둥근 도형과 진남색 외곽선, 작은 글씨 이름표로 그린다.
 const LABEL_STYLE = TEXT.small;
 const VENT = { x: 640, y: 90 };
+const DESK = { x: 640, y: 400, width: 220, height: 120 };
 const SNACK_BAG = { x: 640, y: 400 }; // 책상 위 새우깡 봉지
 const PHOTO = { x: 550, y: 380, width: 26, height: 20 }; // 책상 위 액자 (이야기 단서)
 const BAG_HIT_RANGE = 25; // 날고 있는 구구가 이만큼 가까워지면 봉지에 부딪힌다 (픽셀)
@@ -32,6 +33,9 @@ export default class Stage10Scene extends StageScene {
     this.drawRoom();
     super.create();
     this.npcs.push(new President(this, PRESIDENT.x, PRESIDENT.y));
+
+    // 높이 있는 것: 책상. 날아서 내려앉아야 올라설 수 있다 (새우깡 봉지 · 액자는 책상 위에 있다).
+    this.addObstacle(DESK);
 
     // 총장님이 던지는 서류 뭉치. 경계 게이지가 가득 찬 상태에서 맞으면 환풍구로 돌아간다.
     this.attacking = false;
@@ -167,7 +171,7 @@ export default class Stage10Scene extends StageScene {
     drawVent(this, VENT.x, VENT.y, 80, 50);
     this.add.text(VENT.x, VENT.y - 40, '천장 환풍구', LABEL_STYLE).setOrigin(0.5);
 
-    drawDesk(this, 640, 400, 220, 120);
+    drawDesk(this, DESK.x, DESK.y, DESK.width, DESK.height);
     this.add.text(640, 475, '책상', LABEL_STYLE).setOrigin(0.5);
     drawSnackBag(this, SNACK_BAG.x, SNACK_BAG.y, 34, 28);
     this.add.text(SNACK_BAG.x, SNACK_BAG.y - 28, '새우깡 봉지', LABEL_STYLE).setOrigin(0.5);

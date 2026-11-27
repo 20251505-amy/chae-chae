@@ -28,6 +28,9 @@ export default class Stage02Scene extends StageScene {
     this.drawRoom();
     super.create();
 
+    // 높이 있는 것: 책상, 소파 (날아야 넘어가거나 올라설 수 있다)
+    [DESK, SOFA].forEach((rect) => this.addObstacle(rect));
+
     // 게시판(시간표) · 칠판(낙서가 소파를 가리킴) · 소파 밑 쪽지(비번 규칙)를 이으면 키패드 비밀번호(1821)가 된다.
     // 모두 가까이 가서 쪼아야 살펴볼 수 있다.
     this.addInspectable(BOARD, STAGE02_CLUES.board);
@@ -48,8 +51,8 @@ export default class Stage02Scene extends StageScene {
     ], speed, STUDENT_LOOKS[0]);
 
     // 오른쪽 끝의 출입문. 키패드를 풀면 열리고, 닿으면 다음 스테이지로 이동한다.
-    // Stage 03~09를 만들기 전까지는 Stage 10으로 이동한다.
-    const door = this.addDoor(1265, 360, 20, 120, 'Stage10Scene');
+    // Stage 03으로 이동한다.
+    const door = this.addDoor(1265, 360, 20, 120, 'Stage03Scene');
 
     // 연극부 방 키패드. 맞히면 학생증을 얻고 출입문이 열린다.
     this.addKeypad(KEYPAD.x, KEYPAD.y, '1821', () => {

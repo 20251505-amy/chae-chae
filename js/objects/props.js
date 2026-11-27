@@ -219,3 +219,50 @@ export function drawPhotoFrame(scene, x, y, width, height) {
   dot(g, 5, 2, 3, gray);
   return g;
 }
+
+// 교탁: 회색 상판과 안쪽 테두리 줄, 크림색 출석부, 분필 통
+export function drawLectern(scene, x, y, width, height) {
+  const g = create(scene, x, y);
+  box(g, -width / 2, -height / 2, width, height, gray, 6);
+  g.lineStyle(2, navy, 0.35);
+  g.strokeRoundedRect(-width / 2 + 6, -height / 2 + 6, width - 12, height - 12, 3);
+  box(g, -width / 2 + 14, -height / 2 + 10, 34, height - 20, cream, 2, 2);
+  g.lineStyle(2, navy);
+  g.lineBetween(-width / 2 + 31, -height / 2 + 12, -width / 2 + 31, height / 2 - 12);
+  box(g, width / 2 - 34, -8, 20, 16, navy, 3, 2);
+  [-29, -24, -19].forEach((cx) => dot(g, width / 2 + cx + 4, 0, 2, cream));
+  return g;
+}
+
+// 강의실 책상: 긴 회색 상판, 아래(뒤)쪽에 진남색 의자 두 개. notebook이면 위에 노란 필기 노트를 펼쳐 둔다.
+export function drawClassDesk(scene, x, y, width, height, { notebook = false } = {}) {
+  const g = create(scene, x, y);
+  [-1, 1].forEach((side) => {
+    box(g, side * width / 4 - 14, height / 2 - 2, 28, 18, gray, 6, 2);
+    box(g, side * width / 4 - 14, height / 2 + 12, 28, 6, navy, 3, 1);
+  });
+  box(g, -width / 2, -height / 2, width, height, gray, 5);
+  g.lineStyle(2, navy, 0.35);
+  g.lineBetween(-width / 2 + 8, height / 2 - 7, width / 2 - 8, height / 2 - 7);
+  if (notebook) {
+    box(g, -26, -height / 2 + 6, 52, height - 14, yellow, 2, 2);
+    g.lineStyle(2, navy);
+    g.lineBetween(0, -height / 2 + 6, 0, height / 2 - 8);
+    g.lineStyle(1.5, navy, 0.6);
+    [-6, 0, 6].forEach((dy) => {
+      g.lineBetween(-21, dy, -5, dy);
+      g.lineBetween(5, dy, 21, dy);
+    });
+  }
+  return g;
+}
+
+// 칸막이 벽: 회색 벽돌 띠에 진남색 외곽선 (rect는 가운데 기준)
+export function drawWall(scene, rect) {
+  const g = create(scene, rect.x, rect.y);
+  const { width: w, height: h } = rect;
+  box(g, -w / 2, -h / 2, w, h, gray, 3);
+  g.lineStyle(2, navy, 0.35);
+  for (let bx = -w / 2 + 40; bx < w / 2; bx += 40) g.lineBetween(bx, -h / 2 + 3, bx, h / 2 - 3);
+  return g;
+}

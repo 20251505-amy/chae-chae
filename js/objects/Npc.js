@@ -25,6 +25,7 @@ export default class Npc {
     this.onShoo = null; // 쫓아내기를 썼을 때 부를 함수 (장면이 넣는다. 없으면 쫓아내기를 쓰지 않는다)
     this.shooCooldown = 0;
     this.distractLeft = 0; // 울음소리 쪽을 보고 있는 남은 시간 (ms)
+    this.frozen = false; // true이면 걷지 않고 제자리에 서 있는다 (시야 감지는 그대로)
     this.speed = speed;
     this.targetIndex = 1;
     this.step = 1; // 1이면 앞으로, -1이면 되돌아가는 중
@@ -59,7 +60,7 @@ export default class Npc {
       this.facing = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, gugu.x, gugu.y);
       const close = Phaser.Math.Distance.Between(this.sprite.x, this.sprite.y, gugu.x, gugu.y) <= SHOO_RANGE;
       if (this.onShoo && close && this.shooCooldown === 0) this.shoo();
-    } else if (this.distractLeft === 0) {
+    } else if (this.distractLeft === 0 && !this.frozen) {
       this.move(delta);
     }
     this.drawView();

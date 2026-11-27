@@ -249,3 +249,18 @@
 - **요청 요약:** 실내 스테이지(Stage 02 학생회관 동아리방, Stage 10 총장실)에도 바닥 만들기
 - **수정한 파일:** js/objects/floors.js(새 파일), js/scenes/Stage02Scene.js, js/scenes/Stage10Scene.js, design.md
 - **판단 근거:** 잔디색처럼 5가지 밖의 색을 쓰지 않으려고 마루는 크림 바탕에 회색 반투명 판자 줄로 그렸고, 러그 · 매트는 가구 아래와 출입문 · 창가에만 깔아 학생 시야와 빗자루 범위가 잘 보이게 했다.
+
+## 2026-11-27 (Stage 03)
+- **요청 요약:** Stage 03 인문관(강의실) 만들기 — 칠판 교육학 쪽지시험 빈칸 해독(5486), 학술정보관 열람실 패스, 쉬는 시간 복도 인파 (초안을 먼저 확인받고 진행)
+- **수정한 파일:** js/scenes/Stage03Scene.js(새 파일), js/data/story.js, js/objects/props.js, js/ui/paperStyles.js, js/main.js, js/scenes/Stage02Scene.js, spec.md, task.md, design.md
+- **판단 근거:** Stage 01 · 02와 같은 문제 → 답 정리 → 푸는 순서 힌트 구조로 난이도를 맞췄고, 칠판 · 일기장 종이 모양은 새로 만들지 않고 값 하나(arrowTo · heading)만 더해 다시 썼다. 복도 학생은 속도를 달리해 틈이 생겼다 사라지게 했다.
+
+## 2026-11-27 (Stage 03 벽 · 키패드 중 학생 정지)
+- **요청 요약:** Stage 03 강의실 · 복도 사이 벽을 앞문 · 뒷문 외에는 통과하지 못하게 하기, 키패드를 푸는 동안 학생들이 멈춰 있게 하기 (모든 스테이지)
+- **수정한 파일:** js/scenes/Stage03Scene.js, js/objects/Npc.js, js/scenes/StageScene.js, spec.md
+- **판단 근거:** 사용자 답에 따라 벽은 날아도 막히게(정적 충돌체), 키패드 중에는 학생 걸음만 멈추고 시야 감지 · 미화원은 그대로 두었다. 그림과 충돌이 같은 벽 조각 목록을 쓰게 해 어긋나지 않게 했다.
+
+## 2026-11-27 (높이 있는 물건)
+- **요청 요약:** 높이 있는 것(건물 · 책상 등)은 날기를 써야만 지나갈 수 있게 하기 (모든 스테이지)
+- **수정한 파일:** js/scenes/StageScene.js, js/scenes/Stage01Scene.js, js/scenes/Stage02Scene.js, js/scenes/Stage03Scene.js, js/scenes/Stage10Scene.js, spec.md, design.md
+- **판단 근거:** 사용자 답에 따라 건물 · 가구 전부를 막고, Stage 10 책상 착지가 되도록 물건 위에 내려앉으면 그 위를 걷다가 가장자리로 걸어 내려올 수 있게 했다. 충돌은 StageScene.addObstacle 하나로 모아 스테이지마다 물건 목록만 넘긴다.

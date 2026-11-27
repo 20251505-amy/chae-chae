@@ -3,10 +3,10 @@
 //
 // 단서의 style과 쓰는 값:
 //   newspaper: masthead, date, headline(줄바꿈 \n), article   — 신문 조각 (비둘기 사진 포함)
-//   diary:     date, lines[]                                  — 줄 쳐진 일기장 (한 줄에 한 문장)
+//   diary:     date, lines[], heading?(기본 '나의 일기')       — 줄 쳐진 일기장 · 필기 노트 (한 줄에 한 문장)
 //   note:      text                                           — 테이프 붙은 쪽지
 //   sign:      heading, lines[]                               — 회색 안내판
-//   chalk:     lines[]                                        — 진남색 칠판 + 소파를 가리키는 화살표
+//   chalk:     lines[], arrowTo?                              — 진남색 칠판 (arrowTo가 있으면 그 이름표를 단 소파 그림과 화살표)
 //   poster:    sheetLines[], heading, clocks[[시, 분]...], clockLabels[], footer — 코르크 게시판
 //   photo:     back                                           — 액자 속 사진 (학생과 비둘기)
 import Gugu from '../objects/Gugu.js';
@@ -91,7 +91,7 @@ function drawDiary(scene, clue) {
     sheet(scene, 0, 0, W, H, COLORS.yellow),
     lines,
     scene.add.text(W / 2 - 24, top + 20, clue.date, TEXT.normal).setOrigin(1, 0),
-    scene.add.text(marginX + 16, top + 20, '나의 일기', TEXT.normal),
+    scene.add.text(marginX + 16, top + 20, clue.heading ?? '나의 일기', TEXT.normal),
     ...clue.lines.map((line, i) => scene.add.text(marginX + 16, firstLine + i * gap, line, TEXT.normal)),
   ];
 }
@@ -122,9 +122,14 @@ function drawSign(scene, clue) {
   ];
 }
 
-// 칠판: 진남색 판에 크림색 글씨, 오른쪽 아래에 소파 그림과 그쪽을 가리키는 화살표
+// 칠판: 진남색 판에 크림색 글씨. arrowTo가 있으면 오른쪽 아래에 소파 그림과 그쪽을 가리키는 화살표
 function drawChalk(scene, clue) {
   const chalk = { ...TEXT.normal, color: CSS_COLORS.cream, lineSpacing: 10, wordWrap: { width: W - 120 } };
+  const board = [
+    sheet(scene, 0, 0, W, H, COLORS.navy),
+    scene.add.text(-W / 2 + 40, -H / 2 + 30, clue.lines.join('\n'), chalk),
+  ];
+  if (!clue.arrowTo) return board;
   const doodle = scene.add.graphics();
   doodle.lineStyle(OUTLINE, COLORS.cream);
   const sofa = { x: W / 2 - 120, y: H / 2 - 60 };
@@ -133,10 +138,9 @@ function drawChalk(scene, clue) {
   doodle.lineBetween(sofa.x - 64, sofa.y - 4, sofa.x - 84, sofa.y - 2);
   doodle.lineBetween(sofa.x - 64, sofa.y - 4, sofa.x - 72, sofa.y - 22);
   return [
-    sheet(scene, 0, 0, W, H, COLORS.navy),
-    scene.add.text(-W / 2 + 40, -H / 2 + 30, clue.lines.join('\n'), chalk),
+    ...board,
     doodle,
-    scene.add.text(sofa.x, sofa.y + 26, '소파', { ...TEXT.small, color: CSS_COLORS.cream }).setOrigin(0.5, 0),
+    scene.add.text(sofa.x, sofa.y + 26, clue.arrowTo, { ...TEXT.small, color: CSS_COLORS.cream }).setOrigin(0.5, 0),
   ];
 }
 
